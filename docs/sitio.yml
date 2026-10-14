@@ -22,6 +22,16 @@ paginas_woocommerce:
   cart: {slug: carrito, title: "Carrito"}
   shop: {slug: tienda, title: "Tienda"}
 
+# Página de pago mínima: solo nombre, correo y dominio.
+# La dirección (calle, ciudad, estado, CP) la oculta el plugin hm-whm; aquí se ocultan
+# teléfono, empresa y depto. (hidden | optional | required) y se quitan notas y "Volver al carrito".
+checkout:
+  campo_phone: hidden
+  campo_company: hidden
+  campo_address_2: hidden
+  quitar_notas: true
+  quitar_volver_al_carrito: true
+
 # Plugins del directorio de WordPress.org que se instalan y activan.
 plugins:
   - woocommerce
@@ -38,6 +48,8 @@ woocommerce:
     woocommerce_price_num_decimals: "0"
     woocommerce_calc_taxes: "no"
     woocommerce_ship_to_countries: disabled
+    woocommerce_allowed_countries: specific
+    woocommerce_specific_allowed_countries: [MX]
   account:
     woocommerce_enable_guest_checkout: "no"
     woocommerce_enable_checkout_login_reminder: "yes"

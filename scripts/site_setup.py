@@ -7,6 +7,8 @@ menú, pie de página y salida del modo "Próximamente".
 """
 import html
 import importlib.util
+import json
+import re
 import pathlib
 import sys
 
@@ -208,6 +210,54 @@ def borrar(wp, cfg):
             fail(f"borrar {tipo}/{b['id']}: {e}")
 
 
+def checkout_minimo(wp, cfg):
+    """Quita de la página de pago las notas del pedido y el enlace 'Volver al carrito'."""
+    step("Página de pago")
+    c = cfg.get("checkout") or {}
+    try:
+        for key in ("phone", "company", "address_2"):
+            want = c.get(f"campo_{key}", "hidden")
+            cur = wp.req("GET", "settings").get(f"woocommerce_checkout_{key}_field")
+            if cur != want:
+                wp.req("POST", "settings", json={f"woocommerce_checkout_{key}_field": want})
+                print(f"+ campo {key}: {cur} -> {want}")
+            else:
+                print(f"= campo {key}: {want}")
+    except Exception as e:  # noqa: BLE001
+        fail(f"campos del checkout: {e}")
+    try:
+        pid = wp.wc("GET", "wc/v3/settings/advanced/woocommerce_checkout_page_id").get("value")
+        page = wp.req("GET", f"pages/{pid}", params={"context": "edit"})
+        old = page["content"]["raw"]
+        new = old
+        if c.get("quitar_notas", True):
+            new = re.sub(r'<!-- wp:woocommerce/checkout-order-note-block[^>]*?(/-->|-->.*?<!-- /wp:woocommerce/checkout-order-note-block -->)\s*', "", new, flags=re.S)
+            new = set_block_attr(new, "woocommerce/checkout", "showOrderNotes", False)
+        if c.get("quitar_volver_al_carrito", True):
+            new = set_block_attr(new, "woocommerce/checkout-actions-block", "showReturnToCart", False)
+        if new != old:
+            wp.req("POST", f"pages/{pid}", json={"content": new})
+            print("+ página de pago: sin notas del pedido ni 'Volver al carrito'")
+        else:
+            print("= página de pago sin cambios")
+    except Exception as e:  # noqa: BLE001
+        fail(f"página de pago: {e}")
+
+
+def set_block_attr(content, block, attr, value):
+    """Fija un atributo en el comentario de apertura de un bloque."""
+    pat = re.compile(r'<!-- wp:' + re.escape(block) + r'(\s+(\{.*?\}))?\s*(/?)-->', re.S)
+    m = pat.search(content)
+    if not m:
+        return content
+    attrs = json.loads(m.group(2)) if m.group(2) else {}
+    if attrs.get(attr) == value:
+        return content
+    attrs[attr] = value
+    repl = f'<!-- wp:{block} {json.dumps(attrs, ensure_ascii=False, separators=(",", ":"))} {m.group(3)}-->'.replace("  ", " ")
+    return content[:m.start()] + repl + content[m.end():]
+
+
 def nav_links(items):
     out = []
     for it in items:
@@ -335,6 +385,7 @@ def main():
     plugins(wp, cfg)
     woocommerce(wp, cfg)
     paginas_woocommerce(wp, cfg)
+    checkout_minimo(wp, cfg)
     producto(wp, cfg, publicar)
     whm(wp)
     borrar(wp, cfg)

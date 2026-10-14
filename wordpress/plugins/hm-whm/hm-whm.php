@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Hosting México: WHM
  * Description:       Vende hosting con WooCommerce: crea la cuenta cPanel al confirmarse el pago, avisa de renovaciones, suspende por falta de pago y reactiva al renovar, todo vía la API de WHM.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'HM_WHM_VERSION', '1.0.0' );
+define( 'HM_WHM_VERSION', '1.1.0' );
 define( 'HM_WHM_FILE', __FILE__ );
 define( 'HM_WHM_CPT', 'hm_servicio' );
 
@@ -434,6 +434,94 @@ function hm_whm_order_domain( $order ) {
 	}
 	return hm_whm_clean_domain( $d );
 }
+
+/* =========================================================================
+ * Checkout mínimo: solo nombre, correo y dominio
+ * La tienda vende solo hosting (sin envío), así que la dirección no se pide.
+ * ====================================================================== */
+
+function hm_whm_hidden_address_fields() {
+	return apply_filters( 'hm_whm_hidden_address_fields', array( 'company', 'address_1', 'address_2', 'city', 'state', 'postcode', 'phone' ) );
+}
+
+function hm_whm_hide_locale_fields( $fields ) {
+	foreach ( hm_whm_hidden_address_fields() as $key ) {
+		$fields[ $key ] = array_merge( isset( $fields[ $key ] ) ? (array) $fields[ $key ] : array(), array( 'required' => false, 'hidden' => true ) );
+	}
+	return $fields;
+}
+
+// Checkout de bloques: usa la configuración regional para ocultar y no exigir campos.
+add_filter( 'woocommerce_get_country_locale_default', 'hm_whm_hide_locale_fields', 99 );
+add_filter(
+	'woocommerce_get_country_locale',
+	function ( $locales ) {
+		foreach ( $locales as $country => $fields ) {
+			$locales[ $country ] = hm_whm_hide_locale_fields( (array) $fields );
+		}
+		if ( ! isset( $locales['MX'] ) ) {
+			$locales['MX'] = hm_whm_hide_locale_fields( array() );
+		}
+		return $locales;
+	},
+	99
+);
+
+// Checkout clásico.
+add_filter(
+	'woocommerce_billing_fields',
+	function ( $fields ) {
+		foreach ( hm_whm_hidden_address_fields() as $key ) {
+			unset( $fields[ 'billing_' . $key ] );
+		}
+		return $fields;
+	},
+	99
+);
+add_filter( 'woocommerce_enable_order_notes_field', '__return_false' );
+
+// Los botones "Contratar" agregan el plan al carrito: si ya está, seguir al pago sin mostrar error.
+add_filter(
+	'woocommerce_add_to_cart_validation',
+	function ( $passed, $product_id ) {
+		if ( ! $passed || ! WC()->cart ) {
+			return $passed;
+		}
+		$product = wc_get_product( $product_id );
+		if ( $product && $product->is_sold_individually() && WC()->cart->find_product_in_cart( WC()->cart->generate_cart_id( $product_id ) ) ) {
+			return false;
+		}
+		return $passed;
+	},
+	1,
+	2
+);
+
+// Si solo se vende a un país, el selector de país no aporta nada: se oculta (el valor ya viene fijo).
+add_action(
+	'wp_enqueue_scripts',
+	function () {
+		if ( ! function_exists( 'is_checkout' ) || ! is_checkout() || ! WC()->countries ) {
+			return;
+		}
+		if ( 1 === count( WC()->countries->get_allowed_countries() ) ) {
+			wp_register_style( 'hm-whm-checkout', false, array(), HM_WHM_VERSION );
+			wp_enqueue_style( 'hm-whm-checkout' );
+			wp_add_inline_style( 'hm-whm-checkout', '.wc-block-checkout .wc-block-components-address-form__country,#billing_country_field{display:none!important}' );
+		}
+	}
+);
+
+// Si el país no llega (campo oculto en algún tema), usar México.
+add_action(
+	'woocommerce_checkout_create_order',
+	function ( $order ) {
+		if ( ! $order->get_billing_country() ) {
+			$order->set_billing_country( 'MX' );
+		}
+	},
+	5
+);
 
 /* =========================================================================
  * Producto: campo "Paquete WHM"
