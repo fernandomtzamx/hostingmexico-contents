@@ -1,15 +1,15 @@
-fecha: 2026-10-14T20:45:48Z
-commit: 50e3546b971c81302b1c0b2e4abd671ff40534e0
+fecha: 2026-10-14T21:05:19Z
+commit: d319c3a5e566394f84eee2c7dea28b88dcdba7a5
 evento: push
-resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38634742766
+resultado: failure
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38637424506
 ---
 WP_URL: presente
 WP_USER: presente
 WP_APP_PASSWORD: presente
 Endpoint: https://www.hostingmexico.org/wp-json/ (HTTP 200)
 Métodos de autenticación anunciados: application-passwords
-Conectado como soporte (roles: administrator) | publicar: False
+Conectado como soporte (roles: administrator) | publicar: True
 
 == Ajustes del sitio
 Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
@@ -36,13 +36,13 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 = woocommerce_registration_generate_password: yes
 
 == Páginas de WooCommerce
-+ myaccount: /my-account/ -> /mi-cuenta/ (Mi cuenta)
-+ checkout: /checkout/ -> /finalizar-compra/ (Finalizar compra)
-+ cart: /cart/ -> /carrito/ (Carrito)
-+ shop: /shop/ -> /tienda/ (Tienda)
+= myaccount: /mi-cuenta/
+= checkout: /finalizar-compra/
+= cart: /carrito/
+= shop: /tienda/
 
 == Producto
-Producto actualizado: Hosting Básico $1899 (draft) id=13 https://www.hostingmexico.org/?post_type=product&p=13
+Producto actualizado: Hosting Básico $1899 (publish) id=13 https://www.hostingmexico.org/product/hosting-basico/
 Enlace de compra: https://www.hostingmexico.org/finalizar-compra/?add-to-cart=13
 
 == Plugin WHM
@@ -53,15 +53,24 @@ Enlace de compra: https://www.hostingmexico.org/finalizar-compra/?add-to-cart=13
 = ya en papelera: pages/2 (sample-page)
 = ya en papelera: posts/6 (prueba-conexion-agente)
 
-Configuración aplicada.
+== Lanzamiento (publicar: true)
+! La página inicio no está publicada; no se cambió la portada.
+ERROR página de términos: PUT wc/v3/settings/advanced/woocommerce_terms_page_id -> 400: {"code":"rest_setting_value_invalid","message":"Se pas\u00f3 un valor de ajuste no v\u00e1lido.","data":{"status":400}}
+Menú creado (id 34)
+Encabezado actualizado (twentytwentyfive) con el menú 34
+Pie de página actualizado (twentytwentyfive)
+Tienda visible: modo Próximamente desactivado
+
+1 error(es)
 
 Argumentos: --all
 Endpoint: https://www.hostingmexico.org/wp-json/ (HTTP 200)
 Métodos de autenticación anunciados: application-passwords
 Conectado como soporte (roles: administrator)
-content/paginas/aviso-de-privacidad.md: page actualizada (draft) id=17 https://www.hostingmexico.org/?page_id=17
-content/paginas/contacto.md: page actualizada (draft) id=18 https://www.hostingmexico.org/?page_id=18
-content/paginas/inicio.md: page actualizada (draft) id=19 https://www.hostingmexico.org/?page_id=19
-content/paginas/politica-de-reembolso.md: page actualizada (draft) id=20 https://www.hostingmexico.org/?page_id=20
-content/paginas/preguntas-frecuentes.md: page actualizada (draft) id=21 https://www.hostingmexico.org/?page_id=21
-content/paginas/terminos-y-condiciones.md: page actualizada (draft) id=22 https://www.hostingmexico.org/?page_id=22
+content/paginas/aviso-de-privacidad.md: page actualizada (publish) id=17 https://www.hostingmexico.org/aviso-de-privacidad/
+content/paginas/contacto.md: page actualizada (publish) id=18 https://www.hostingmexico.org/contacto/
+content/paginas/inicio.md: page actualizada (publish) id=19 https://www.hostingmexico.org/inicio/
+content/paginas/politica-de-reembolso.md: page actualizada (publish) id=20 https://www.hostingmexico.org/politica-de-reembolso/
+content/paginas/preguntas-frecuentes.md: page actualizada (publish) id=21 https://www.hostingmexico.org/preguntas-frecuentes/
+content/paginas/terminos-y-condiciones.md: page actualizada (publish) id=22 https://www.hostingmexico.org/terminos-y-condiciones/
+La configuración (site_setup) tuvo errores; revisa arriba.
