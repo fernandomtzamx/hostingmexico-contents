@@ -37,14 +37,43 @@ def ajustes(wp, cfg):
         "title": s.get("title"),
         "description": s.get("description"),
         "timezone": s.get("timezone"),
+        "language": s.get("language"),
         "date_format": s.get("date_format"),
         "start_of_week": s.get("start_of_week"),
     }.items() if v is not None}
     try:
         res = wp.req("POST", "settings", json=payload)
-        print(f"Título: {res.get('title')} | Zona: {res.get('timezone')}")
+        print(f"Título: {res.get('title')} | Zona: {res.get('timezone')} | Idioma: {res.get('language')}")
+        if s.get("language") and res.get("language") != s.get("language"):
+            print(f"! El idioma {s.get('language')} no está instalado: elígelo en Ajustes > Generales > Idioma del sitio "
+                  "(WordPress lo descarga al guardar) y luego actualiza traducciones en Escritorio > Actualizaciones.")
     except Exception as e:  # noqa: BLE001
-        fail(f"ajustes: {e}")
+        if "language" in payload and "language" in str(e):
+            payload.pop("language")
+            res = wp.req("POST", "settings", json=payload)
+            print(f"Título: {res.get('title')} | Zona: {res.get('timezone')}")
+            print(f"! El idioma {s.get('language')} no está instalado: elígelo en Ajustes > Generales > Idioma del sitio.")
+        else:
+            fail(f"ajustes: {e}")
+
+
+def paginas_woocommerce(wp, cfg):
+    step("Páginas de WooCommerce")
+    groups = {"shop": "products"}
+    for key, want in (cfg.get("paginas_woocommerce") or {}).items():
+        try:
+            pid = wp.wc("GET", f"wc/v3/settings/{groups.get(key, 'advanced')}/woocommerce_{key}_page_id").get("value")
+            if not pid:
+                print(f"! WooCommerce no tiene página para {key}")
+                continue
+            page = wp.req("GET", f"pages/{pid}", params={"context": "edit"})
+            if page["slug"] == want["slug"] and page["title"]["raw"] == want["title"]:
+                print(f"= {key}: /{want['slug']}/")
+                continue
+            wp.req("POST", f"pages/{pid}", json={"slug": want["slug"], "title": want["title"]})
+            print(f"+ {key}: /{page['slug']}/ -> /{want['slug']}/ ({want['title']})")
+        except Exception as e:  # noqa: BLE001
+            fail(f"página {key}: {e}")
 
 
 def plugins(wp, cfg):
@@ -298,6 +327,7 @@ def main():
     ajustes(wp, cfg)
     plugins(wp, cfg)
     woocommerce(wp, cfg)
+    paginas_woocommerce(wp, cfg)
     producto(wp, cfg, publicar)
     whm(wp)
     borrar(wp, cfg)

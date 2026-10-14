@@ -11,8 +11,16 @@ sitio:
   title: "Hosting México"
   description: "Hosting con cPanel, SSL gratis y soporte en español"
   timezone: "America/Mexico_City"
+  language: "es_MX"
   date_format: "j \\d\\e F \\d\\e Y"
   start_of_week: 1
+
+# Páginas que crea WooCommerce (se renombran al español). Clave = opción woocommerce_<clave>_page_id.
+paginas_woocommerce:
+  myaccount: {slug: mi-cuenta, title: "Mi cuenta"}
+  checkout: {slug: finalizar-compra, title: "Finalizar compra"}
+  cart: {slug: carrito, title: "Carrito"}
+  shop: {slug: tienda, title: "Tienda"}
 
 # Plugins del directorio de WordPress.org que se instalan y activan.
 plugins:
