@@ -1,8 +1,8 @@
-fecha: 2026-10-14T21:33:07Z
-commit: 0c565d056e4d1d2bc47a1ab8f91d030766d8802b
+fecha: 2026-10-14T21:51:30Z
+commit: b2dea469842aa8ac448e8d5d23314103a101bf68
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38641080428
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38643376171
 ---
 WP_URL: presente
 WP_USER: presente
@@ -48,6 +48,11 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 = campo company: hidden
 = campo address_2: hidden
 = página de pago sin cambios
+
+== Métodos de pago
++ activo: woo-mercado-pago-basic (Mercado Pago) {}
+  ! ajustes no disponibles en esta versión: installments, method, auto_return, binary_mode, currency_conversion
+Métodos activos: woo-mercado-pago-basic
 
 == Estilos globales
 Estilos aplicados al tema twentytwentyfive (id 33). Tipografías: Platypi, Fira Sans
