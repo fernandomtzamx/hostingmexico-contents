@@ -6,16 +6,18 @@ on:
     paths:
       - "content/**"
       - "images/**"
+      - "docs/sitio.yml"
       - "scripts/publish.py"
+      - "scripts/site_setup.py"
       - ".github/workflows/publish.yml"
   workflow_dispatch:
     inputs:
       mode:
-        description: "check = probar credenciales, all = republicar todo content/"
+        description: "check = probar credenciales, all = republicar todo content/, setup = aplicar docs/sitio.yml"
         required: true
         default: check
         type: choice
-        options: [check, all]
+        options: [check, all, setup]
 
 permissions:
   contents: write
@@ -54,7 +56,7 @@ jobs:
           set -o pipefail
           MODE="${{ inputs.mode }}"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            if [ "$MODE" = "all" ]; then ARGS="--all"; else ARGS="--check"; fi
+            if [ "$MODE" = "all" ]; then ARGS="--all"; elif [ "$MODE" = "setup" ]; then python scripts/site_setup.py 2>&1 | tee -a publish.log; exit ${PIPESTATUS[0]}; else ARGS="--check"; fi
           else
             BEFORE="${{ github.event.before }}"
             if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
@@ -62,11 +64,18 @@ jobs:
             else
               FILES=$(git diff --name-only --diff-filter=AM "$BEFORE" "${{ github.sha }}" -- 'content/')
             fi
+            # Si cambió la configuración, aplicarla antes de publicar (crea el producto que usa {{comprar}}).
+            SETUP_RC=0
+            if [ -z "$BEFORE" ] || git diff --name-only "$BEFORE" "${{ github.sha }}" 2>/dev/null | grep -qE '^(docs/sitio\.yml|scripts/site_setup\.py)$'; then
+              python scripts/site_setup.py 2>&1 | tee -a publish.log || SETUP_RC=1
+              echo "" | tee -a publish.log
+            fi
             FILES=$(echo "$FILES" | grep '\.md$' | tr '\n' ' ' || true)
             if [ -z "$FILES" ]; then ARGS="--check"; else ARGS="$FILES"; fi
           fi
           echo "Argumentos: $ARGS" | tee -a publish.log
           python scripts/publish.py $ARGS 2>&1 | tee -a publish.log
+          if [ "${SETUP_RC:-0}" != "0" ]; then echo "La configuración (site_setup) tuvo errores; revisa arriba." | tee -a publish.log; exit 1; fi
 
       - name: Guardar registro en el repo
         if: always()

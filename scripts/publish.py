@@ -19,6 +19,11 @@ Frontmatter soportado:
     categories:   lista de slugs de categoría (se crean si no existen)
     tags:         lista de nombres de etiqueta (se crean si no existen)
     parent:       slug de la página padre (solo páginas)
+    format:       markdown (por defecto) | blocks (cuerpo en marcado de bloques de Gutenberg)
+    template:     plantilla del tema, ej. page-no-title
+
+Marcadores en el cuerpo:
+    {{comprar}}   página de pago con el producto hosting-basico ya en el carrito
 
 Si ya existe una entrada o página con el mismo slug, se actualiza en lugar de duplicarse.
 """
@@ -51,7 +56,7 @@ class WP:
         # Resolver redirecciones (http->https, sin www->www) antes de autenticar:
         # requests descarta el encabezado Authorization al cambiar de host.
         probe = requests.get(base.rstrip("/") + "/wp-json/", timeout=30,
-                             headers={"User-Agent": "hostingmexico-agente/1.0"})
+                             headers={"User-Agent": "hostingmexico-agente/1.1"})
         final = probe.url.split("/wp-json")[0]
         if final.rstrip("/") != base.rstrip("/"):
             print(f"Aviso: {base} redirige a {final}; uso la URL final.")
@@ -64,7 +69,7 @@ class WP:
         self.api = final.rstrip("/") + "/wp-json/wp/v2"
         self.s = requests.Session()
         self.s.auth = (user, password.replace(" ", ""))
-        self.s.headers["User-Agent"] = "hostingmexico-agente/1.0"
+        self.s.headers["User-Agent"] = "hostingmexico-agente/1.1"
         # Copia de la credencial en un encabezado propio, por si el servidor borra Authorization
         # (lo recibe el mu-plugin wordpress/mu-plugins/agente-auth.php).
         token = base64.b64encode(f"{user}:{password.replace(' ', '')}".encode()).decode()
@@ -161,6 +166,41 @@ def media_id(self, file_path, alt):
 WP.media_id = media_id
 
 
+PRODUCTO_COMPRAR = "hosting-basico"
+
+
+def wc(self, method, path, **kw):
+    """Llamada a la API REST de WooCommerce (/wp-json/wc/v3/...)."""
+    base = self.api.rsplit("/wp/v2", 1)[0]
+    r = self.s.request(method, f"{base}/{path}", timeout=60, **kw)
+    if r.status_code >= 400:
+        raise RuntimeError(f"{method} {path} -> {r.status_code}: {r.text[:300]}")
+    return r.json() if r.text else {}
+
+
+def buy_url(self, product_slug):
+    """URL de la página de pago con el producto agregado al carrito."""
+    cache = getattr(self, "_buy_cache", {})
+    if product_slug in cache:
+        return cache[product_slug]
+    prods = self.wc("GET", "wc/v3/products", params={"slug": product_slug, "status": "any"})
+    if not prods:
+        raise RuntimeError(f"no existe el producto '{product_slug}' (corre el modo setup)")
+    checkout_id = self.wc("GET", "wc/v3/settings/advanced/woocommerce_checkout_page_id").get("value")
+    link = self.req("GET", f"pages/{checkout_id}", params={"context": "edit"})["link"] if checkout_id else None
+    if not link:
+        raise RuntimeError("WooCommerce no tiene página de pago configurada")
+    sep = "&" if "?" in link else "?"
+    url = f"{link}{sep}add-to-cart={prods[0]['id']}"
+    cache[product_slug] = url
+    self._buy_cache = cache
+    return url
+
+
+WP.wc = wc
+WP.buy_url = buy_url
+
+
 INTERNAL_HOSTS = ("hostingmexico.org", "www.hostingmexico.org")
 _A_TAG = re.compile(r"<a\s[^>]*>", re.I)
 
@@ -197,16 +237,33 @@ def parse(path):
     status = meta.get("status", "draft")
     if status not in VALID_STATUS:
         raise ValueError(f"{path}: status inválido '{status}'")
-    html = markdown.markdown(
-        body.strip(),
-        extensions=["tables", "fenced_code", "sane_lists", "toc", "attr_list", "md_in_html"],
-        extension_configs={"toc": {"toc_depth": "2-3", "title": "Índice de contenidos"}},
-    )
+    if meta.get("format") == "blocks":
+        # El cuerpo ya viene en marcado de bloques de Gutenberg: se publica tal cual.
+        html = body.strip()
+    else:
+        html = markdown.markdown(
+            body.strip(),
+            extensions=["tables", "fenced_code", "sane_lists", "toc", "attr_list", "md_in_html"],
+            extension_configs={"toc": {"toc_depth": "2-3", "title": "Índice de contenidos"}},
+        )
     return meta, nofollow_external(html)
+
+
+def resolve_placeholders(wp, html):
+    """{{comprar}} -> página de pago con el producto ya en el carrito (slug en PRODUCTO_COMPRAR)."""
+    if "{{comprar}}" not in html:
+        return html
+    try:
+        url = wp.buy_url(PRODUCTO_COMPRAR)
+    except Exception as e:  # noqa: BLE001
+        print(f"  Aviso: no pude armar el enlace de compra ({e}); uso /tienda/ temporalmente.")
+        url = "/tienda/"
+    return html.replace("{{comprar}}", url)
 
 
 def publish(wp, path):
     meta, html = parse(path)
+    html = resolve_placeholders(wp, html)
     kind = meta.get("type", "post")
     endpoint = "pages" if kind == "page" else "posts"
     payload = {
@@ -220,6 +277,8 @@ def publish(wp, path):
     }
     if meta.get("excerpt"):
         payload["excerpt"] = meta["excerpt"]
+    if meta.get("template"):
+        payload["template"] = meta["template"]
     if meta.get("date"):
         # Fecha local de Ciudad de México (UTC-6, sin horario de verano desde 2022).
         local = datetime.datetime.fromisoformat(str(meta["date"]))

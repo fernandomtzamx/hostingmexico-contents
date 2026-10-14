@@ -1,0 +1,93 @@
+# Configuración de hostingmexico.org que aplica scripts/site_setup.py.
+# Se aplica sola al hacer push de este archivo, o con:
+# Actions > Publicar en WordPress > Run workflow > setup
+
+# false: todo queda en borrador para revisión (producto en borrador, portada y menú sin cambiar).
+# true:  publica el producto, fija la portada, crea el menú y el pie de página
+#        y quita el modo "Próximamente" de WooCommerce.
+publicar: false
+
+sitio:
+  title: "Hosting México"
+  description: "Hosting con cPanel, SSL gratis y soporte en español"
+  timezone: "America/Mexico_City"
+  date_format: "j \\d\\e F \\d\\e Y"
+  start_of_week: 1
+
+# Plugins del directorio de WordPress.org que se instalan y activan.
+plugins:
+  - woocommerce
+  - woocommerce-mercadopago
+
+# Ajustes de WooCommerce: grupo -> opción -> valor (API /wc/v3/settings).
+woocommerce:
+  general:
+    woocommerce_currency: MXN
+    woocommerce_default_country: "MX:DF"
+    woocommerce_currency_pos: left
+    woocommerce_price_thousand_sep: ","
+    woocommerce_price_decimal_sep: "."
+    woocommerce_price_num_decimals: "0"
+    woocommerce_calc_taxes: "no"
+    woocommerce_ship_to_countries: disabled
+  account:
+    woocommerce_enable_guest_checkout: "no"
+    woocommerce_enable_checkout_login_reminder: "yes"
+    woocommerce_enable_signup_and_login_from_checkout: "yes"
+    woocommerce_enable_myaccount_registration: "yes"
+    woocommerce_registration_generate_password: "yes"
+
+producto:
+  slug: hosting-basico
+  nombre: "Hosting Básico"
+  precio: "1899"
+  paquete_whm: hm_basico
+  descripcion_corta: |
+    <p><strong>$1,899 MXN al año, IVA incluido.</strong> El mismo precio al renovar.</p>
+    <ul>
+    <li>1 sitio web con tu dominio y hasta 5 subdominios</li>
+    <li>20 GB NVMe y 250 GB de transferencia al mes</li>
+    <li>10 cuentas de correo y 5 bases de datos</li>
+    <li>SSL gratis, cPanel y respaldos automáticos</li>
+    <li>Soporte por correo en español</li>
+    </ul>
+    <p>Al pagar, tu cuenta se crea automáticamente y recibes tus accesos por correo.</p>
+  descripcion: |
+    <h2>Qué incluye</h2>
+    <ul>
+    <li><strong>1 sitio web</strong> con un dominio principal y hasta 5 subdominios.</li>
+    <li><strong>20 GB de almacenamiento NVMe</strong> y <strong>250 GB de transferencia</strong> mensual.</li>
+    <li><strong>10 cuentas de correo</strong> con tu dominio y <strong>5 bases de datos</strong> MySQL.</li>
+    <li><strong>Certificado SSL gratis</strong> que se instala y renueva solo.</li>
+    <li><strong>cPanel</strong> en español y <strong>respaldos automáticos</strong>.</li>
+    <li><strong>Soporte por correo en español</strong>, de lunes a viernes de 9:00 a 18:00 (hora del centro de México).</li>
+    </ul>
+    <h2>Antes de contratar</h2>
+    <ul>
+    <li>Necesitas un dominio propio. Escríbelo al contratar (por ejemplo, tunegocio.com).</li>
+    <li>Paga con tarjeta, OXXO o transferencia a través de Mercado Pago.</li>
+    <li>La vigencia es de 12 meses. Te avisamos antes del vencimiento para que renueves con un clic.</li>
+    <li>Garantía de 30 días en tu primera contratación.</li>
+    </ul>
+    <p>Consulta los <a href="/terminos-y-condiciones/">términos y condiciones</a> y la <a href="/politica-de-reembolso/">política de reembolso</a>.</p>
+
+# Menú principal (se crea cuando publicar: true).
+menu:
+  - {label: "Inicio", url: "/"}
+  - {label: "Qué incluye", url: "/#plan"}
+  - {label: "Preguntas frecuentes", url: "/preguntas-frecuentes/"}
+  - {label: "Contacto", url: "/contacto/"}
+  - {label: "Mi cuenta", url: "/mi-cuenta/"}
+
+# Enlaces del pie de página (se aplica cuando publicar: true).
+pie:
+  - {label: "Términos y condiciones", url: "/terminos-y-condiciones/"}
+  - {label: "Aviso de privacidad", url: "/aviso-de-privacidad/"}
+  - {label: "Política de reembolso", url: "/politica-de-reembolso/"}
+  - {label: "Contacto", url: "/contacto/"}
+
+# Contenido de ejemplo que va a la papelera (recuperable). Se confirma el slug antes de borrar.
+borrar:
+  - {id: 1, slug: hello-world, tipo: posts}
+  - {id: 2, slug: sample-page}
+  - {id: 6, slug: prueba-conexion-agente, tipo: posts}
