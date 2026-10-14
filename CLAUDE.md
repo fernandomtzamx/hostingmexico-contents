@@ -1,9 +1,9 @@
 # Instrucciones para Claude
 
-Este repo alimenta el sitio WordPress hostingmexico.org. Cada push a `main` se publica en el sitio vía el mu-plugin `agente-auth` (usuario `soporte`).
+Este repo alimenta hostingmexico.org. Cada push a `main` que toque `content/` se publica vía `.github/workflows/publish.yml` con el usuario `soporte`.
 
-- Entradas nuevas: `content/posts/<slug>.md`. Páginas: `content/pages/<slug>.md`.
-- Siempre incluir front matter con `title`, `slug` y `status`. Usar `status: draft` salvo que el usuario pida publicar.
+- Contenido nuevo: `content/<sección>/<slug>.md` con frontmatter (`title`, `slug`, `status`). Formato completo en README.md.
+- Usar `status: draft` salvo que el usuario pida publicar o programar.
 - Idioma: español de México. No usar guión largo (—) en los textos.
-- No modificar `mu-plugins/agente-auth.php` salvo que se pida explícitamente; si se modifica, el usuario debe volver a subirlo al servidor.
-- Formato y campos disponibles: ver README.md.
+- Después de cada push, leer `registro/ultima-publicacion.log` (hacer `git pull`, el workflow lo escribe unos segundos después) para confirmar el resultado.
+- Si `wordpress/mu-plugins/agente-auth.php` cambia, el usuario debe volver a subirlo al servidor.

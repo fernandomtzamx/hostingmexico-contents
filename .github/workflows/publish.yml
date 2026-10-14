@@ -1,0 +1,88 @@
+name: Publicar en WordPress
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "content/**"
+      - "images/**"
+      - "scripts/publish.py"
+      - ".github/workflows/publish.yml"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "check = probar credenciales, all = republicar todo content/"
+        required: true
+        default: check
+        type: choice
+        options: [check, all]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-wordpress
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      WP_URL: ${{ secrets.WP_URL }}
+      WP_USER: ${{ secrets.WP_USER }}
+      WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - run: pip install -q -r requirements.txt
+
+      - name: Diagnóstico de secretos (sin revelar valores)
+        run: |
+          for v in WP_URL WP_USER WP_APP_PASSWORD; do
+            if [ -n "${!v}" ]; then echo "$v: presente"; else echo "$v: FALTA"; fi
+          done | tee -a publish.log
+
+      - name: Publicar
+        id: publicar
+        run: |
+          set -o pipefail
+          MODE="${{ inputs.mode }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "$MODE" = "all" ]; then ARGS="--all"; else ARGS="--check"; fi
+          else
+            BEFORE="${{ github.event.before }}"
+            if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+              FILES=$(git ls-files 'content/*.md' 'content/**/*.md')
+            else
+              FILES=$(git diff --name-only --diff-filter=AM "$BEFORE" "${{ github.sha }}" -- 'content/')
+            fi
+            FILES=$(echo "$FILES" | grep '\.md$' | tr '\n' ' ' || true)
+            if [ -z "$FILES" ]; then ARGS="--check"; else ARGS="$FILES"; fi
+          fi
+          echo "Argumentos: $ARGS" | tee -a publish.log
+          python scripts/publish.py $ARGS 2>&1 | tee -a publish.log
+
+      - name: Guardar registro en el repo
+        if: always()
+        run: |
+          mkdir -p registro
+          {
+            echo "fecha: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "commit: ${{ github.sha }}"
+            echo "evento: ${{ github.event_name }}"
+            echo "resultado: ${{ steps.publicar.outcome }}"
+            echo "run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo "---"
+            cat publish.log 2>/dev/null || echo "(sin log)"
+          } > registro/ultima-publicacion.log
+          git config user.name "hostingmexico-bot"
+          git config user.email "hostingmexico-bot@users.noreply.github.com"
+          git add registro/ultima-publicacion.log
+          git commit -m "Registro de publicación [skip ci]" || exit 0
+          git pull --rebase -q origin main && git push -q origin HEAD:main

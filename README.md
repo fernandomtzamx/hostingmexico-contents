@@ -1,66 +1,54 @@
 # hostingmexico-contents
 
-Contenidos de hostingmexico.org gestionados por Claude a través de GitHub.
+Contenidos de hostingmexico.org. Claude escribe Markdown aquí y GitHub Actions lo publica en WordPress por la API REST.
 
-Flujo: **Claude → commit en este repo → webhook de GitHub → mu-plugin `agente-auth` → WordPress (usuario `soporte`)**
+Flujo: **Claude → push a `main` → workflow “Publicar en WordPress” → API REST (usuario `soporte`, contraseña de aplicación)**
 
 ## Estructura
 
 ```
-mu-plugins/agente-auth.php   Plugin que conecta WordPress con este repo
-content/posts/*.md           Entradas (post)
-content/pages/*.md           Páginas (page)
-wp-config.example.php        Constantes de configuración
+content/<sección>/*.md                Entradas y páginas (Markdown con frontmatter)
+content/pruebas/prueba-conexion.md    Entrada de prueba (borrador)
+scripts/publish.py                    Publica Markdown en WordPress; crea categorías y etiquetas si faltan
+.github/workflows/publish.yml         Publica lo que cambie en content/ en cada push; botón manual en modo check
+wordpress/mu-plugins/agente-auth.php  Rescata la credencial si el servidor borra el header Authorization
+registro/ultima-publicacion.log       Log de la última ejecución (lo escribe el workflow)
+images/                               Imágenes destacadas
 ```
 
-## Instalación en WordPress
+## Configuración (una sola vez)
 
-1. **Usuario**: en wp-admin crea (o confirma) el usuario `soporte` con rol **Editor** (o Administrador si también gestionará ajustes).
-2. **Plugin**: sube `mu-plugins/agente-auth.php` a `wp-content/mu-plugins/agente-auth.php` (crea la carpeta si no existe). Los mu-plugins se activan solos.
-3. **Configuración**: copia las constantes de `wp-config.example.php` a tu `wp-config.php` y genera valores propios con `openssl rand -hex 32`.
-4. **Webhook de GitHub**: en este repo, *Settings → Webhooks → Add webhook*:
-   - Payload URL: `https://hostingmexico.org/wp-json/agente/v1/webhook`
-   - Content type: `application/json`
-   - Secret: el mismo valor de `AGENTE_GITHUB_SECRET`
-   - Eventos: *Just the push event*
-5. **Prueba**:
-   ```bash
-   curl -H "Authorization: Bearer TU_AGENTE_AUTH_TOKEN" https://hostingmexico.org/wp-json/agente/v1/ping
-   ```
-   Debe responder `{"ok":true,"user":"soporte",...}`.
+1. **WordPress**: usuario `soporte` con rol Editor. En su perfil, crea una contraseña de aplicación (ej. “agente-claude”).
+2. **mu-plugin**: sube `wordpress/mu-plugins/agente-auth.php` a `wp-content/mu-plugins/`.
+3. **Secretos** en Settings → Secrets and variables → Actions:
+   - `WP_URL` = `https://www.hostingmexico.org`
+   - `WP_USER` = `soporte`
+   - `WP_APP_PASSWORD` = la contraseña de aplicación
+4. **Probar**: Actions → Publicar en WordPress → Run workflow → modo `check`.
 
-> Si el servidor (Apache/CGI) elimina la cabecera `Authorization`, agrega a `.htaccess`:
-> `SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1`
-> o usa la cabecera alternativa `X-Agente-Token: TU_TOKEN`.
+## Errores típicos
 
-## Endpoints
+- `401 rest_not_logged_in`: el header se pierde; revisa que el mu-plugin esté subido.
+- `403`: firewall o plugin de seguridad (Wordfence, Cloudflare) bloqueando `/wp-json/`.
+- `FALTA` en el diagnóstico de secretos: el secreto no está creado o tiene otro nombre.
 
-| Método | Ruta | Auth | Uso |
-|---|---|---|---|
-| GET | `/wp-json/agente/v1/ping` | Bearer | Verifica conexión y usuario |
-| POST | `/wp-json/agente/v1/sync` | Bearer | Sincroniza todo el repo, o un archivo con `{"path":"content/posts/x.md"}` |
-| POST | `/wp-json/agente/v1/webhook` | Firma HMAC de GitHub | Sincroniza automáticamente los archivos del push |
+## Frontmatter
 
-Además, con el Bearer token Claude puede usar toda la REST API estándar (`/wp-json/wp/v2/posts`, `/media`, etc.) actuando como `soporte`.
-
-## Formato de contenido
-
-```markdown
+```yaml
 ---
-title: "Título del post"
-slug: titulo-del-post
-status: draft          # draft | publish | pending | private
-date: 2026-10-14
-excerpt: "Resumen corto"
-categories: [Hosting, Guías]
-tags: [wordpress, dominios]
-featured_image: https://ejemplo.com/imagen.jpg
+title: "Título"             # obligatorio
+slug: titulo                 # obligatorio
+type: post                   # post | page
+status: draft                # draft | publish | pending | private
+date: 2026-10-20 09:00       # hora de Ciudad de México; si es futura y status publish, se programa
+excerpt: "Resumen"
+categories: [hosting]        # slugs, se crean si no existen
+tags: [WordPress, dominios]  # nombres, se crean si no existen
+parent: slug-padre           # solo páginas
+featured_image: images/archivo.png
+featured_alt: "Texto alternativo"
+id: 123                      # opcional: actualiza esa entrada aunque cambie el slug
 ---
-
-Contenido en **Markdown**. También se acepta HTML.
 ```
 
-- Los archivos en `content/pages/` se crean como páginas (admiten `parent: slug-padre`).
-- Si `status` no se indica, se crea como **borrador**.
-- Editar un archivo actualiza el mismo post (se enlaza por la ruta del archivo).
-- Borrar un archivo pasa el post a borrador (no lo elimina).
+Si ya existe una entrada con el mismo slug, se actualiza en vez de duplicarse. Los enlaces externos llevan `rel="nofollow"` y los comentarios quedan cerrados.
