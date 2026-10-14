@@ -232,7 +232,7 @@ def lanzamiento(wp, cfg):
     # Página de términos que enlaza el checkout
     try:
         terms = wp.find_by_slug("pages", "terminos-y-condiciones")
-        if terms:
+        if terms and terms["status"] == "publish":
             wp.wc("PUT", "wc/v3/settings/advanced/woocommerce_terms_page_id", json={"value": str(terms["id"])})
             print(f"Términos del checkout: página {terms['id']}")
     except Exception as e:  # noqa: BLE001
@@ -323,6 +323,13 @@ def main():
     wp = pub.WP(pub.env("WP_URL"), pub.env("WP_USER"), pub.env("WP_APP_PASSWORD"))
     me = wp.whoami()
     print(f"Conectado como {me.get('username')} (roles: {', '.join(me.get('roles', []))}) | publicar: {publicar}")
+    if "--lanzamiento" in sys.argv:
+        # Segunda pasada, después de publicar las páginas (portada y términos necesitan páginas publicadas).
+        if publicar:
+            lanzamiento(wp, cfg)
+        if errors:
+            sys.exit(f"\n{errors} error(es)")
+        return
 
     ajustes(wp, cfg)
     plugins(wp, cfg)
@@ -331,8 +338,6 @@ def main():
     producto(wp, cfg, publicar)
     whm(wp)
     borrar(wp, cfg)
-    if publicar:
-        lanzamiento(wp, cfg)
 
     if errors:
         sys.exit(f"\n{errors} error(es)")

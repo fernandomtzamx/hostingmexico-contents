@@ -56,7 +56,7 @@ jobs:
           set -o pipefail
           MODE="${{ inputs.mode }}"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            if [ "$MODE" = "all" ]; then ARGS="--all"; elif [ "$MODE" = "setup" ]; then python scripts/site_setup.py 2>&1 | tee -a publish.log; exit ${PIPESTATUS[0]}; else ARGS="--check"; fi
+            if [ "$MODE" = "all" ]; then ARGS="--all"; elif [ "$MODE" = "setup" ]; then python scripts/site_setup.py 2>&1 | tee -a publish.log && python scripts/site_setup.py --lanzamiento 2>&1 | tee -a publish.log; exit ${PIPESTATUS[0]}; else ARGS="--check"; fi
           else
             BEFORE="${{ github.event.before }}"
             if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
@@ -77,6 +77,7 @@ jobs:
           fi
           echo "Argumentos: $ARGS" | tee -a publish.log
           python scripts/publish.py $ARGS 2>&1 | tee -a publish.log
+          if [ -n "${SETUP_RAN:-}" ]; then echo "" | tee -a publish.log; python scripts/site_setup.py --lanzamiento 2>&1 | tee -a publish.log || SETUP_RC=1; fi
           if [ "${SETUP_RC:-0}" != "0" ]; then echo "La configuración (site_setup) tuvo errores; revisa arriba." | tee -a publish.log; exit 1; fi
 
       - name: Guardar registro en el repo
