@@ -2,7 +2,7 @@
 title: "Contacto"
 slug: contacto
 type: page
-status: draft
+status: publish
 excerpt: "Escríbenos para dudas antes de contratar, soporte técnico o facturación."
 ---
 

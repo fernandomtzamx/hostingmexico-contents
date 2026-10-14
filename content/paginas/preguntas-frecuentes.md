@@ -2,7 +2,7 @@
 title: "Preguntas frecuentes"
 slug: preguntas-frecuentes
 type: page
-status: draft
+status: publish
 excerpt: "Todo sobre el plan Hosting Básico: qué incluye, cómo se paga, cómo se activa, renovaciones, facturas y soporte."
 ---
 

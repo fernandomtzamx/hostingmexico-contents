@@ -2,7 +2,7 @@
 title: "Hosting en México con cPanel"
 slug: inicio
 type: page
-status: draft
+status: publish
 format: blocks
 template: page-no-title
 excerpt: "Hosting con cPanel, SSL gratis y soporte en español. Un solo plan de $1,899 MXN al año, IVA incluido, con el mismo precio al renovar."

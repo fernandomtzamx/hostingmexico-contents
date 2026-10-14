@@ -5,7 +5,7 @@
 # false: todo queda en borrador para revisión (producto en borrador, portada y menú sin cambiar).
 # true:  publica el producto, fija la portada, crea el menú y el pie de página
 #        y quita el modo "Próximamente" de WooCommerce.
-publicar: false
+publicar: true
 
 sitio:
   title: "Hosting México"

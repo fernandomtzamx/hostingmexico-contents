@@ -2,7 +2,7 @@
 title: "Términos y condiciones del servicio"
 slug: terminos-y-condiciones
 type: page
-status: draft
+status: publish
 excerpt: "Condiciones de contratación, uso, renovación, suspensión y cancelación del servicio de hosting."
 ---
 

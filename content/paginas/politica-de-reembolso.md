@@ -2,7 +2,7 @@
 title: "Política de reembolso"
 slug: politica-de-reembolso
 type: page
-status: draft
+status: publish
 excerpt: "Garantía de 30 días en tu primera contratación de Hosting Básico."
 ---
 

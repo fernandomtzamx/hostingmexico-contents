@@ -2,7 +2,7 @@
 title: "Aviso de privacidad"
 slug: aviso-de-privacidad
 type: page
-status: draft
+status: publish
 excerpt: "Cómo tratamos tus datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares."
 ---
 
