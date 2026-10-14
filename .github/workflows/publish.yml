@@ -7,6 +7,7 @@ on:
       - "content/**"
       - "images/**"
       - "docs/sitio.yml"
+      - "docs/estilos.json"
       - "scripts/publish.py"
       - "scripts/site_setup.py"
       - ".github/workflows/publish.yml"
@@ -66,7 +67,7 @@ jobs:
             fi
             # Si cambió la configuración, aplicarla antes de publicar (crea el producto que usa {{comprar}}).
             SETUP_RC=0
-            if [ -z "$BEFORE" ] || git diff --name-only "$BEFORE" "${{ github.sha }}" 2>/dev/null | grep -qE '^(docs/sitio\.yml|scripts/site_setup\.py)$'; then
+            if [ -z "$BEFORE" ] || git diff --name-only "$BEFORE" "${{ github.sha }}" 2>/dev/null | grep -qE '^(docs/sitio\.yml|docs/estilos\.json|scripts/site_setup\.py)$'; then
               python scripts/site_setup.py 2>&1 | tee -a publish.log || SETUP_RC=1
               echo "" | tee -a publish.log
               SETUP_RAN=1

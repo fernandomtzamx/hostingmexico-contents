@@ -258,6 +258,26 @@ def set_block_attr(content, block, attr, value):
     return content[:m.start()] + repl + content[m.end():]
 
 
+def estilos(wp):
+    """Aplica docs/estilos.json como estilos globales del tema activo (colores, tipografía, CSS)."""
+    step("Estilos globales")
+    path = ROOT / "docs" / "estilos.json"
+    if not path.exists():
+        return
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        theme = next(t for t in wp.req("GET", "themes", params={"status": "active"}))
+        links = theme.get("_links", {}).get("wp:user-global-styles") or []
+        if not links:
+            raise RuntimeError(f"el tema {theme['stylesheet']} no admite estilos globales")
+        gid = links[0]["href"].rstrip("/").split("/")[-1]
+        wp.req("POST", f"global-styles/{gid}", json={"settings": data.get("settings", {}), "styles": data.get("styles", {})})
+        fams = [f["name"] for f in data.get("settings", {}).get("typography", {}).get("fontFamilies", {}).get("theme", [])]
+        print(f"Estilos aplicados al tema {theme['stylesheet']} (id {gid}). Tipografías: {', '.join(fams)}")
+    except Exception as e:  # noqa: BLE001
+        fail(f"estilos: {e}")
+
+
 def nav_links(items):
     out = []
     for it in items:
@@ -386,6 +406,7 @@ def main():
     woocommerce(wp, cfg)
     paginas_woocommerce(wp, cfg)
     checkout_minimo(wp, cfg)
+    estilos(wp)
     producto(wp, cfg, publicar)
     whm(wp)
     borrar(wp, cfg)

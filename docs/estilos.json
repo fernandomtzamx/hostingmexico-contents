@@ -1,0 +1,301 @@
+{
+  "version": 3,
+  "settings": {
+    "color": {
+      "palette": {
+        "theme": [
+          {
+            "slug": "base",
+            "name": "Blanco",
+            "color": "#FFFFFF"
+          },
+          {
+            "slug": "contrast",
+            "name": "Tinta",
+            "color": "#161B2E"
+          },
+          {
+            "slug": "accent-1",
+            "name": "Talavera",
+            "color": "#1F3FA3"
+          },
+          {
+            "slug": "accent-2",
+            "name": "Cempasúchil",
+            "color": "#F2A20C"
+          },
+          {
+            "slug": "accent-3",
+            "name": "Talavera profundo",
+            "color": "#0F2466"
+          },
+          {
+            "slug": "accent-4",
+            "name": "Gris tinta",
+            "color": "#5B6478"
+          },
+          {
+            "slug": "accent-5",
+            "name": "Superficie",
+            "color": "#EEF2FB"
+          },
+          {
+            "slug": "accent-6",
+            "name": "Línea",
+            "color": "#D6DDEE"
+          }
+        ]
+      }
+    },
+    "typography": {
+      "fontFamilies": {
+        "theme": [
+          {
+            "name": "Platypi",
+            "slug": "platypi",
+            "fontFamily": "Platypi, Georgia, serif",
+            "fontFace": [
+              {
+                "fontFamily": "Platypi",
+                "fontStyle": "normal",
+                "fontWeight": "300 800",
+                "src": [
+                  "file:./assets/fonts/platypi/Platypi-VariableFont_wght.woff2"
+                ]
+              },
+              {
+                "fontFamily": "Platypi",
+                "fontStyle": "italic",
+                "fontWeight": "300 800",
+                "src": [
+                  "file:./assets/fonts/platypi/Platypi-Italic-VariableFont_wght.woff2"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Fira Sans",
+            "slug": "fira-sans",
+            "fontFamily": "\"Fira Sans\", system-ui, sans-serif",
+            "fontFace": [
+              {
+                "fontFamily": "\"Fira Sans\"",
+                "fontStyle": "normal",
+                "fontWeight": "400",
+                "src": [
+                  "file:./assets/fonts/fira-sans/FiraSans-Regular.woff2"
+                ]
+              },
+              {
+                "fontFamily": "\"Fira Sans\"",
+                "fontStyle": "italic",
+                "fontWeight": "400",
+                "src": [
+                  "file:./assets/fonts/fira-sans/FiraSans-Italic.woff2"
+                ]
+              },
+              {
+                "fontFamily": "\"Fira Sans\"",
+                "fontStyle": "normal",
+                "fontWeight": "500",
+                "src": [
+                  "file:./assets/fonts/fira-sans/FiraSans-Medium.woff2"
+                ]
+              },
+              {
+                "fontFamily": "\"Fira Sans\"",
+                "fontStyle": "normal",
+                "fontWeight": "600",
+                "src": [
+                  "file:./assets/fonts/fira-sans/FiraSans-SemiBold.woff2"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "fontSizes": {
+        "theme": [
+          {
+            "slug": "small",
+            "name": "Chico",
+            "size": "0.9375rem",
+            "fluid": false
+          },
+          {
+            "slug": "medium",
+            "name": "Mediano",
+            "size": "1.125rem",
+            "fluid": false
+          },
+          {
+            "slug": "large",
+            "name": "Grande",
+            "size": "1.375rem",
+            "fluid": {
+              "min": "1.25rem",
+              "max": "1.375rem"
+            }
+          },
+          {
+            "slug": "x-large",
+            "name": "Muy grande",
+            "size": "2.25rem",
+            "fluid": {
+              "min": "1.75rem",
+              "max": "2.25rem"
+            }
+          },
+          {
+            "slug": "xx-large",
+            "name": "Enorme",
+            "size": "4rem",
+            "fluid": {
+              "min": "2.5rem",
+              "max": "4rem"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "var:preset|color|base",
+      "text": "var:preset|color|contrast"
+    },
+    "typography": {
+      "fontFamily": "var:preset|font-family|fira-sans",
+      "fontSize": "var:preset|font-size|medium",
+      "lineHeight": "1.6",
+      "fontWeight": "400"
+    },
+    "elements": {
+      "heading": {
+        "typography": {
+          "fontFamily": "var:preset|font-family|platypi",
+          "fontWeight": "600",
+          "lineHeight": "1.12",
+          "letterSpacing": "-0.015em"
+        },
+        "color": {
+          "text": "var:preset|color|contrast"
+        }
+      },
+      "h1": {
+        "typography": {
+          "fontSize": "var:preset|font-size|xx-large"
+        }
+      },
+      "h2": {
+        "typography": {
+          "fontSize": "var:preset|font-size|x-large"
+        }
+      },
+      "h3": {
+        "typography": {
+          "fontSize": "var:preset|font-size|large",
+          "lineHeight": "1.25"
+        }
+      },
+      "link": {
+        "color": {
+          "text": "var:preset|color|accent-1"
+        },
+        "typography": {
+          "textDecoration": "underline"
+        },
+        ":hover": {
+          "color": {
+            "text": "var:preset|color|accent-3"
+          }
+        }
+      },
+      "button": {
+        "color": {
+          "background": "var:preset|color|accent-1",
+          "text": "var:preset|color|base"
+        },
+        "typography": {
+          "fontFamily": "var:preset|font-family|fira-sans",
+          "fontWeight": "600",
+          "fontSize": "1rem"
+        },
+        "border": {
+          "radius": "10px"
+        },
+        "spacing": {
+          "padding": {
+            "top": "0.85rem",
+            "bottom": "0.85rem",
+            "left": "1.5rem",
+            "right": "1.5rem"
+          }
+        },
+        ":hover": {
+          "color": {
+            "background": "var:preset|color|accent-3",
+            "text": "var:preset|color|base"
+          }
+        },
+        ":focus": {
+          "outline": {
+            "color": "var:preset|color|accent-2",
+            "offset": "3px",
+            "style": "solid",
+            "width": "3px"
+          }
+        }
+      }
+    },
+    "blocks": {
+      "core/site-title": {
+        "typography": {
+          "fontFamily": "var:preset|font-family|platypi",
+          "fontWeight": "700",
+          "fontSize": "1.375rem",
+          "letterSpacing": "-0.01em"
+        },
+        "elements": {
+          "link": {
+            "typography": {
+              "textDecoration": "none"
+            },
+            "color": {
+              "text": "var:preset|color|accent-3"
+            }
+          }
+        }
+      },
+      "core/navigation": {
+        "typography": {
+          "fontSize": "1rem",
+          "fontWeight": "500"
+        },
+        "elements": {
+          "link": {
+            "typography": {
+              "textDecoration": "none"
+            }
+          }
+        }
+      },
+      "core/details": {
+        "border": {
+          "bottom": {
+            "color": "var:preset|color|accent-6",
+            "width": "1px",
+            "style": "solid"
+          }
+        },
+        "spacing": {
+          "padding": {
+            "top": "1rem",
+            "bottom": "1rem"
+          }
+        }
+      }
+    },
+    "css": ".wp-site-blocks > header{border-bottom:1px solid var(--wp--preset--color--accent-6);background:var(--wp--preset--color--base)}\n.wp-block-navigation a:hover{color:var(--wp--preset--color--accent-1)}\n.wp-block-button.is-style-outline>.wp-block-button__link{background:transparent;color:var(--wp--preset--color--accent-1);border:2px solid currentColor;padding-top:calc(.85rem - 2px);padding-bottom:calc(.85rem - 2px)}\n.wp-block-button.is-style-outline>.wp-block-button__link:hover{background:var(--wp--preset--color--accent-5);color:var(--wp--preset--color--accent-3)}\na:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--wp--preset--color--accent-2);outline-offset:2px}\n.wp-block-details summary{font-family:var(--wp--preset--font-family--platypi);font-weight:600;font-size:1.25rem;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:1rem}\n.wp-block-details summary::-webkit-details-marker{display:none}\n.wp-block-details summary::after{content:'+';color:var(--wp--preset--color--accent-1);font-size:1.5rem;line-height:1}\n.wp-block-details[open] summary::after{content:'\\2212'}\n.wp-block-details>p{color:var(--wp--preset--color--accent-4);max-width:62ch}\n.hm-precio{position:relative}\n.hm-precio .hm-cifra{font-family:var(--wp--preset--font-family--platypi);font-weight:700;font-size:clamp(4.5rem,11vw,8.5rem);line-height:.9;letter-spacing:-.04em;margin:0}\n.hm-precio .hm-cifra sup{font-size:.4em;vertical-align:.95em;margin-right:.05em;font-weight:600}\n.hm-precio .hm-condiciones{font-family:var(--wp--preset--font-family--platypi);font-weight:500;font-size:clamp(1.5rem,2.6vw,2rem);line-height:1.15;letter-spacing:-.01em}\n.hm-precio .hm-condiciones li{border-top:2px solid rgba(15,36,102,.25);padding:.5rem 0;list-style:none}\n.hm-precio .hm-condiciones{padding:0;margin:0}\n.hm-specs .hm-fila{border-top:1px solid var(--wp--preset--color--accent-6);padding:1rem 0;margin:0!important;align-items:baseline}\n.hm-specs .hm-fila:last-child{border-bottom:1px solid var(--wp--preset--color--accent-6)}\n.hm-specs .hm-valor{font-family:var(--wp--preset--font-family--platypi);font-weight:600;font-size:1.75rem;line-height:1.1;color:var(--wp--preset--color--accent-1);margin:0;min-width:7.5rem}\n.hm-specs .hm-dato{margin:0}\n.hm-razones .wp-block-column{border-top:3px solid var(--wp--preset--color--accent-1);padding-top:1.25rem}\n.hm-razones p{color:var(--wp--preset--color--accent-4)}\n.hm-pasos .hm-num{font-family:var(--wp--preset--font-family--platypi);font-weight:700;font-size:3rem;line-height:1;color:var(--wp--preset--color--accent-1);margin:0 0 .5rem}\n.hm-pasos p{color:var(--wp--preset--color--accent-4)}\n.hm-final h2,.hm-final p{color:var(--wp--preset--color--base)}\n.hm-final .wp-block-button__link{background:var(--wp--preset--color--accent-2);color:var(--wp--preset--color--accent-3)}\n.hm-final .wp-block-button__link:hover{background:#FFB938;color:var(--wp--preset--color--accent-3)}\n.wc-block-checkout .wc-block-components-title,.wc-block-cart .wc-block-components-title{font-family:var(--wp--preset--font-family--platypi)}\n.wc-block-components-button:not(.is-link){border-radius:10px}\n@media (max-width:781px){.hm-specs .hm-fila{flex-wrap:nowrap!important}.hm-specs .hm-valor{min-width:6rem;font-size:1.4rem}}\n@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}\nhtml{scroll-behavior:smooth}\n.wp-site-blocks > footer .wp-block-group > p.has-small-font-size{max-width:var(--wp--style--global--wide-size);color:var(--wp--preset--color--accent-4)}\n.wp-site-blocks > footer{border-top:1px solid var(--wp--preset--color--accent-6)}\n.wp-site-blocks > footer,.wp-site-blocks > main{margin-block-start:0}\n.home .wp-site-blocks > main > .wp-block-post-content{margin-block-end:0}"
+  }
+}
