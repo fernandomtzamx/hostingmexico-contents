@@ -1,14 +1,60 @@
-fecha: 2026-10-14T20:20:16Z
-commit: 9fdef3cf288be00c196f85acc255bcbb5e864b2a
+fecha: 2026-10-14T20:43:57Z
+commit: ce3035351c8838f0c2ffc0717472d244822bda38
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38631157934
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38634467591
 ---
 WP_URL: presente
 WP_USER: presente
 WP_APP_PASSWORD: presente
-Argumentos: content/pruebas/prueba-conexion.md 
+Endpoint: https://www.hostingmexico.org/wp-json/ (HTTP 200)
+Métodos de autenticación anunciados: application-passwords
+Conectado como soporte (roles: administrator) | publicar: False
+
+== Ajustes del sitio
+Título: Hosting México | Zona: America/Mexico_City
+
+== Plugins
++ instalado y activado: woocommerce 11.2.1
++ instalado y activado: woocommerce-mercadopago 8.9.6
+! Falta el plugin hm-whm (Hosting México: WHM). Súbelo en Plugins > Añadir nuevo > Subir plugin.
+
+== WooCommerce
++ woocommerce_currency: USD -> MXN
++ woocommerce_default_country: US:CA -> MX:DF
+= woocommerce_currency_pos: left
+= woocommerce_price_thousand_sep: ,
+= woocommerce_price_decimal_sep: .
++ woocommerce_price_num_decimals: 2 -> 0
+= woocommerce_calc_taxes: no
++ woocommerce_ship_to_countries:  -> disabled
++ woocommerce_enable_guest_checkout: yes -> no
++ woocommerce_enable_checkout_login_reminder: no -> yes
++ woocommerce_enable_signup_and_login_from_checkout: no -> yes
++ woocommerce_enable_myaccount_registration: no -> yes
+= woocommerce_registration_generate_password: yes
+
+== Producto
+Producto creado: Hosting Básico $1899 (draft) id=13 https://www.hostingmexico.org/?post_type=product&p=13
+Enlace de compra: https://www.hostingmexico.org/checkout/?add-to-cart=13
+
+== Plugin WHM
+! El plugin hm-whm no está activo todavía.
+
+== Contenido de ejemplo a la papelera
+- a la papelera: posts/1 (hello-world)
+- a la papelera: pages/2 (sample-page)
+- a la papelera: posts/6 (prueba-conexion-agente)
+
+Configuración aplicada.
+
+Argumentos: content/paginas/aviso-de-privacidad.md content/paginas/contacto.md content/paginas/inicio.md content/paginas/politica-de-reembolso.md content/paginas/preguntas-frecuentes.md content/paginas/terminos-y-condiciones.md 
 Endpoint: https://www.hostingmexico.org/wp-json/ (HTTP 200)
 Métodos de autenticación anunciados: application-passwords
 Conectado como soporte (roles: administrator)
-content/pruebas/prueba-conexion.md: post creada (draft) id=6 https://www.hostingmexico.org/?p=6
+content/paginas/aviso-de-privacidad.md: page creada (draft) id=17 https://www.hostingmexico.org/?page_id=17
+content/paginas/contacto.md: page creada (draft) id=18 https://www.hostingmexico.org/?page_id=18
+content/paginas/inicio.md: page creada (draft) id=19 https://www.hostingmexico.org/?page_id=19
+content/paginas/politica-de-reembolso.md: page creada (draft) id=20 https://www.hostingmexico.org/?page_id=20
+content/paginas/preguntas-frecuentes.md: page creada (draft) id=21 https://www.hostingmexico.org/?page_id=21
+content/paginas/terminos-y-condiciones.md: page creada (draft) id=22 https://www.hostingmexico.org/?page_id=22
