@@ -1,8 +1,8 @@
-fecha: 2026-10-14T21:06:16Z
-commit: 758960b42a5a82fbfa89e3360e7803bb54204c24
+fecha: 2026-10-14T21:23:49Z
+commit: d1871f7897aaae1b3e12373227f959c94369a8c2
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38637539182
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38639871735
 ---
 WP_URL: presente
 WP_USER: presente
@@ -29,6 +29,8 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 = woocommerce_price_num_decimals: 0
 = woocommerce_calc_taxes: no
 = woocommerce_ship_to_countries: disabled
++ woocommerce_allowed_countries: all -> specific
++ woocommerce_specific_allowed_countries:  -> ['MX']
 = woocommerce_enable_guest_checkout: no
 = woocommerce_enable_checkout_login_reminder: yes
 = woocommerce_enable_signup_and_login_from_checkout: yes
@@ -40,6 +42,12 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 = checkout: /finalizar-compra/
 = cart: /carrito/
 = shop: /tienda/
+
+== Página de pago
++ campo phone: optional -> hidden
+= campo company: hidden
++ campo address_2: optional -> hidden
++ página de pago: sin notas del pedido ni 'Volver al carrito'
 
 == Producto
 Producto actualizado: Hosting Básico $1899 (publish) id=13 https://www.hostingmexico.org/product/hosting-basico/
@@ -61,7 +69,7 @@ Métodos de autenticación anunciados: application-passwords
 Conectado como soporte (roles: administrator)
 content/paginas/aviso-de-privacidad.md: page actualizada (publish) id=17 https://www.hostingmexico.org/aviso-de-privacidad/
 content/paginas/contacto.md: page actualizada (publish) id=18 https://www.hostingmexico.org/contacto/
-content/paginas/inicio.md: page actualizada (publish) id=19 https://www.hostingmexico.org/inicio/
+content/paginas/inicio.md: page actualizada (publish) id=19 https://www.hostingmexico.org/
 content/paginas/politica-de-reembolso.md: page actualizada (publish) id=20 https://www.hostingmexico.org/politica-de-reembolso/
 content/paginas/preguntas-frecuentes.md: page actualizada (publish) id=21 https://www.hostingmexico.org/preguntas-frecuentes/
 content/paginas/terminos-y-condiciones.md: page actualizada (publish) id=22 https://www.hostingmexico.org/terminos-y-condiciones/
