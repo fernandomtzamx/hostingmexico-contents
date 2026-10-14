@@ -1,8 +1,8 @@
-fecha: 2026-10-14T21:23:49Z
-commit: d1871f7897aaae1b3e12373227f959c94369a8c2
+fecha: 2026-10-14T21:33:07Z
+commit: 0c565d056e4d1d2bc47a1ab8f91d030766d8802b
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38639871735
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38641080428
 ---
 WP_URL: presente
 WP_USER: presente
@@ -29,8 +29,8 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 = woocommerce_price_num_decimals: 0
 = woocommerce_calc_taxes: no
 = woocommerce_ship_to_countries: disabled
-+ woocommerce_allowed_countries: all -> specific
-+ woocommerce_specific_allowed_countries:  -> ['MX']
+= woocommerce_allowed_countries: specific
+= woocommerce_specific_allowed_countries: ['MX']
 = woocommerce_enable_guest_checkout: no
 = woocommerce_enable_checkout_login_reminder: yes
 = woocommerce_enable_signup_and_login_from_checkout: yes
@@ -44,10 +44,13 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 = shop: /tienda/
 
 == Página de pago
-+ campo phone: optional -> hidden
+= campo phone: hidden
 = campo company: hidden
-+ campo address_2: optional -> hidden
-+ página de pago: sin notas del pedido ni 'Volver al carrito'
+= campo address_2: hidden
+= página de pago sin cambios
+
+== Estilos globales
+Estilos aplicados al tema twentytwentyfive (id 33). Tipografías: Platypi, Fira Sans
 
 == Producto
 Producto actualizado: Hosting Básico $1899 (publish) id=13 https://www.hostingmexico.org/product/hosting-basico/
