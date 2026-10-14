@@ -1,0 +1,14 @@
+fecha: 2026-10-14T20:20:16Z
+commit: 9fdef3cf288be00c196f85acc255bcbb5e864b2a
+evento: push
+resultado: success
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38631157934
+---
+WP_URL: presente
+WP_USER: presente
+WP_APP_PASSWORD: presente
+Argumentos: content/pruebas/prueba-conexion.md 
+Endpoint: https://www.hostingmexico.org/wp-json/ (HTTP 200)
+Métodos de autenticación anunciados: application-passwords
+Conectado como soporte (roles: administrator)
+content/pruebas/prueba-conexion.md: post creada (draft) id=6 https://www.hostingmexico.org/?p=6
