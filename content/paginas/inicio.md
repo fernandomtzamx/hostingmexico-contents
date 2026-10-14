@@ -29,7 +29,7 @@ excerpt: "Hosting con cPanel, SSL gratis y soporte en español. Un solo plan de 
 <!-- /wp:buttons -->
 
 <!-- wp:paragraph {"fontSize":"small","textColor":"accent-4"} -->
-<p class="has-accent-4-color has-text-color has-small-font-size">Paga con tarjeta, OXXO o transferencia a través de Mercado Pago.</p>
+<p class="has-accent-4-color has-text-color has-small-font-size">Paga con tarjeta, OXXO o saldo de Mercado Pago, con meses sin intereses en tarjetas participantes.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
@@ -233,7 +233,7 @@ excerpt: "Hosting con cPanel, SSL gratis y soporte en español. Un solo plan de 
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Tarjeta de crédito o débito, efectivo en OXXO o transferencia, con Mercado Pago.</p>
+<p>Tarjeta de crédito o débito, efectivo en OXXO o saldo de Mercado Pago. Con tarjeta de crédito, también a meses sin intereses.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
@@ -288,7 +288,7 @@ excerpt: "Hosting con cPanel, SSL gratis y soporte en español. Un solo plan de 
 
 <!-- wp:details -->
 <details class="wp-block-details"><summary>¿Cuánto tarda en activarse?</summary><!-- wp:paragraph -->
-<p>La cuenta se crea sola en cuanto Mercado Pago confirma tu pago. Con tarjeta es casi inmediato; en OXXO o transferencia depende de cuándo se acredite el pago.</p>
+<p>La cuenta se crea sola en cuanto Mercado Pago confirma tu pago. Con tarjeta es casi inmediato; en efectivo depende de cuándo se acredite el pago.</p>
 <!-- /wp:paragraph --></details>
 <!-- /wp:details -->
 

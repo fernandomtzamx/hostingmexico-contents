@@ -38,11 +38,11 @@ Sí. El plan incluye el hospedaje, no el registro del dominio. Si todavía no ti
 
 ### ¿Cómo puedo pagar?
 
-A través de Mercado Pago: tarjeta de crédito o débito, efectivo en OXXO o transferencia. El precio es en pesos mexicanos e incluye IVA.
+A través de Mercado Pago: tarjeta de crédito o débito, efectivo en OXXO y otras tiendas, o saldo de tu cuenta de Mercado Pago. Con tarjetas de crédito participantes puedes pagar a meses sin intereses. El precio es en pesos mexicanos e incluye IVA.
 
 ### ¿Cuánto tarda en activarse mi cuenta?
 
-La cuenta se crea de forma automática en cuanto Mercado Pago confirma tu pago. Con tarjeta suele ser cuestión de minutos. En OXXO o transferencia depende de cuándo se acredite el pago. En cuanto queda lista te enviamos un correo con tus accesos.
+La cuenta se crea de forma automática en cuanto Mercado Pago confirma tu pago. Con tarjeta suele ser cuestión de minutos. En efectivo depende de cuándo se acredite el pago. En cuanto queda lista te enviamos un correo con tus accesos.
 
 ### ¿Me dan factura?
 

@@ -20,7 +20,7 @@ Escribe a [soporte@hostingmexico.org](mailto:soporte@hostingmexico.org) desde el
 
 - El reembolso se hace por el mismo medio de pago, a través de Mercado Pago.
 - En pagos con tarjeta, el tiempo en que se refleja depende de tu banco.
-- En pagos en efectivo (OXXO) o transferencia, te pediremos una cuenta CLABE a tu nombre.
+- En pagos en efectivo (OXXO y otras tiendas), te pediremos una cuenta CLABE a tu nombre.
 
 Al aprobarse el reembolso, la cuenta de hosting se cancela y su información se elimina. Descarga un respaldo antes de solicitarlo si lo necesitas.
 

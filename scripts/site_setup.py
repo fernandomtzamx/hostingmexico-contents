@@ -258,6 +258,50 @@ def set_block_attr(content, block, attr, value):
     return content[:m.start()] + repl + content[m.end():]
 
 
+def pagos(wp, cfg):
+    step("Métodos de pago")
+    p = cfg.get("pagos") or {}
+    try:
+        gws = {g["id"]: g for g in wp.wc("GET", "wc/v3/payment_gateways")}
+    except Exception as e:  # noqa: BLE001
+        fail(f"listar métodos de pago: {e}")
+        return
+    for gid, ajustes in (p.get("activar") or {}).items():
+        g = gws.get(gid)
+        if not g:
+            fail(f"no existe el método {gid} (¿está activo el plugin de Mercado Pago?)")
+            continue
+        payload = {"enabled": True}
+        for k in ("title", "description"):
+            if k in (ajustes or {}):
+                payload[k] = ajustes[k]
+        known = g.get("settings") or {}
+        settings = {k: str(v) for k, v in (ajustes or {}).items() if k not in ("title", "description")}
+        unknown = [k for k in settings if k not in known]
+        settings = {k: v for k, v in settings.items() if k in known}
+        if settings:
+            payload["settings"] = settings
+        try:
+            res = wp.wc("PUT", f"wc/v3/payment_gateways/{gid}", json=payload)
+            vals = {k: (res.get("settings") or {}).get(k, {}).get("value") for k in settings}
+            print(f"+ activo: {gid} ({res.get('title')}) {vals}")
+            if unknown:
+                print(f"  ! ajustes no disponibles en esta versión: {', '.join(unknown)}")
+        except Exception as e:  # noqa: BLE001
+            fail(f"activar {gid}: {e}")
+    for gid in p.get("desactivar") or []:
+        g = gws.get(gid)
+        if not g or not g.get("enabled"):
+            continue
+        try:
+            wp.wc("PUT", f"wc/v3/payment_gateways/{gid}", json={"enabled": False})
+            print(f"- desactivado: {gid}")
+        except Exception as e:  # noqa: BLE001
+            fail(f"desactivar {gid}: {e}")
+    activos = [f"{g['id']}" for g in wp.wc("GET", "wc/v3/payment_gateways") if g.get("enabled")]
+    print(f"Métodos activos: {', '.join(activos) or 'ninguno'}")
+
+
 def estilos(wp):
     """Aplica docs/estilos.json como estilos globales del tema activo (colores, tipografía, CSS)."""
     step("Estilos globales")
@@ -406,6 +450,7 @@ def main():
     woocommerce(wp, cfg)
     paginas_woocommerce(wp, cfg)
     checkout_minimo(wp, cfg)
+    pagos(wp, cfg)
     estilos(wp)
     producto(wp, cfg, publicar)
     whm(wp)

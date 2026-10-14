@@ -32,6 +32,21 @@ checkout:
   quitar_notas: true
   quitar_volver_al_carrito: true
 
+# Métodos de pago (WooCommerce > Ajustes > Pagos). Solo Mercado Pago Checkout Pro:
+# tarjeta, OXXO y tiendas, saldo Mercado Pago y meses sin intereses (estos se activan
+# en tu cuenta de Mercado Pago). Las credenciales NO van aquí: se pegan en WooCommerce > Mercado Pago.
+pagos:
+  activar:
+    woo-mercado-pago-basic:
+      title: "Mercado Pago"
+      description: "Paga con tarjeta de crédito o débito, efectivo en OXXO o saldo de Mercado Pago. Meses sin intereses con tarjetas participantes."
+      installments: "12"      # máximo de mensualidades que se ofrecen
+      method: redirect        # lleva al cliente a Mercado Pago y lo regresa al terminar
+      auto_return: "yes"
+      binary_mode: "no"       # "no" permite pagos pendientes (necesario para OXXO)
+      currency_conversion: "no"
+  desactivar: [bacs, cheque, cod, woo-mercado-pago-custom, woo-mercado-pago-ticket, woo-mercado-pago-credits, woo-mercado-pago-pix, woo-mercado-pago-pse, woo-mercado-pago-yape]
+
 # Plugins del directorio de WordPress.org que se instalan y activan.
 plugins:
   - woocommerce
@@ -85,7 +100,7 @@ producto:
     <h2>Antes de contratar</h2>
     <ul>
     <li>Necesitas un dominio propio. Escríbelo al contratar (por ejemplo, tunegocio.com).</li>
-    <li>Paga con tarjeta, OXXO o transferencia a través de Mercado Pago.</li>
+    <li>Paga con tarjeta, OXXO o saldo de Mercado Pago, con meses sin intereses en tarjetas participantes.</li>
     <li>La vigencia es de 12 meses. Te avisamos antes del vencimiento para que renueves con un clic.</li>
     <li>Garantía de 30 días en tu primera contratación.</li>
     </ul>
