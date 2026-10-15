@@ -369,8 +369,28 @@ def nav_links(items):
     return "\n".join(out)
 
 
+def marca(wp, cfg):
+    """Sube logo e ícono y los fija como logo e ícono del sitio. Devuelve el bloque a usar en encabezados."""
+    m = cfg.get("marca") or {}
+    bloque = '<!-- wp:site-title {"level":0} /-->'
+    try:
+        if m.get("logo"):
+            lid = wp.media_id(ROOT / m["logo"], m.get("logo_alt", "Hosting México"))
+            payload = {"site_logo": lid}
+            if m.get("icono"):
+                payload["site_icon"] = wp.media_id(ROOT / m["icono"], "Ícono de Hosting México")
+            wp.req("POST", "settings", json=payload)
+            print(f"Logo del sitio: medio {lid}" + (f" | ícono: medio {payload['site_icon']}" if "site_icon" in payload else ""))
+            ancho = int(m.get("ancho", 210))
+            bloque = '<!-- wp:site-logo {"width":%d,"shouldSyncIcon":false,"className":"hm-logo"} /-->' % ancho
+    except Exception as e:  # noqa: BLE001
+        fail(f"logo: {e}")
+    return bloque
+
+
 def lanzamiento(wp, cfg):
     step("Lanzamiento (publicar: true)")
+    logo = marca(wp, cfg)
     # Portada
     try:
         inicio = wp.find_by_slug("pages", "inicio")
@@ -420,7 +440,7 @@ def lanzamiento(wp, cfg):
             '<!-- wp:group {"layout":{"type":"constrained"}} -->\n<div class="wp-block-group">'
             '<!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|30"}}},"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between"}} -->\n'
             '<div class="wp-block-group alignwide" style="padding-top:var(--wp--preset--spacing--30);padding-bottom:var(--wp--preset--spacing--30)">'
-            '<!-- wp:site-title {"level":0} /-->\n'
+            f'{logo}\n'
             '<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|20"}},"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"right"}} -->\n'
             '<div class="wp-block-group">'
             f'<!-- wp:navigation {{"ref":{menu_id},"overlayBackgroundColor":"base","overlayTextColor":"contrast","layout":{{"type":"flex","justifyContent":"right","flexWrap":"wrap"}}}} /-->\n'
@@ -441,6 +461,7 @@ def lanzamiento(wp, cfg):
             tid = "woocommerce/woocommerce//checkout-header"
             raw = wp.req("GET", f"template-parts/{tid}", params={"context": "edit"})["content"]["raw"]
             limpio = re.sub(r"<!-- wp:html -->\s*<!-- Google Tag Manager -->.*?<!-- /wp:html -->\s*", "", raw, flags=re.S)
+            limpio = re.sub(r"<!-- wp:(site-title|site-logo)[^>]*/-->", logo, limpio)
             nuevo = gtm_block(cfg["gtm"]) + limpio
             if nuevo != raw:
                 wp.req("POST", f"template-parts/{tid}", json={"content": nuevo})
@@ -460,7 +481,7 @@ def lanzamiento(wp, cfg):
             '<!-- wp:group {"style":{"spacing":{"padding":{"top":"var:preset|spacing|60","bottom":"var:preset|spacing|50"}}},"layout":{"type":"constrained"}} -->\n'
             '<div class="wp-block-group" style="padding-top:var(--wp--preset--spacing--60);padding-bottom:var(--wp--preset--spacing--50)">'
             '<!-- wp:group {"align":"wide","layout":{"type":"flex","flexWrap":"wrap","justifyContent":"space-between"}} -->\n'
-            '<div class="wp-block-group alignwide"><!-- wp:site-title {"level":0} /-->\n\n'
+            f'<div class="wp-block-group alignwide">{logo}\n\n'
             '<!-- wp:navigation {"overlayMenu":"never","layout":{"type":"flex","orientation":"horizontal","flexWrap":"wrap"},"fontSize":"small"} -->\n'
             f'{links}\n<!-- /wp:navigation --></div>\n<!-- /wp:group -->\n\n'
             '<!-- wp:paragraph {"fontSize":"small"} -->\n'

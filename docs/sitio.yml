@@ -10,6 +10,13 @@ publicar: true
 # Google Tag Manager: se inserta al inicio del encabezado en todas las páginas.
 gtm: GTM-5PTRT2J
 
+# Logo del encabezado (también se usa en el encabezado de pago y el pie) e ícono de pestaña.
+marca:
+  logo: images/logo-hostingmexico.png
+  logo_alt: "Hosting México"
+  icono: images/icono-hostingmexico.png
+  ancho: 240
+
 sitio:
   title: "Hosting México"
   description: "Hosting con cPanel, SSL gratis y soporte en español"
