@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Hosting México: WHM
  * Description:       Vende hosting con WooCommerce: crea la cuenta cPanel al confirmarse el pago, avisa de renovaciones, suspende por falta de pago y reactiva al renovar, todo vía la API de WHM.
- * Version:           1.2.0
+ * Version:           1.3.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'HM_WHM_VERSION', '1.2.0' );
+define( 'HM_WHM_VERSION', '1.3.0' );
 define( 'HM_WHM_FILE', __FILE__ );
 define( 'HM_WHM_CPT', 'hm_servicio' );
 
@@ -825,7 +825,108 @@ function hm_whm_apply_renewal( $order, $sid ) {
 
 add_action( 'hm_whm_daily', 'hm_whm_daily' );
 
+/**
+ * Sincroniza WHM -> sitio: estado (activo/suspendido), paquete y cuentas borradas.
+ * Solo modifica registros de WordPress; nunca cambia nada en WHM.
+ *
+ * @return array|WP_Error
+ */
+function hm_whm_reconcile() {
+	$data = HM_WHM_API::call( 'listaccts', array( 'want' => 'user,domain,plan,suspended' ) );
+	if ( is_wp_error( $data ) ) {
+		return $data;
+	}
+	$whm = array();
+	foreach ( (array) ( isset( $data['acct'] ) ? $data['acct'] : array() ) as $a ) {
+		$whm[ strtolower( $a['user'] ) ] = $a;
+	}
+	$ids = get_posts(
+		array(
+			'post_type'      => HM_WHM_CPT,
+			'post_status'    => 'any',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_query'     => array( array( 'key' => '_hm_status', 'value' => array( 'activo', 'suspendido' ), 'compare' => 'IN' ) ),
+		)
+	);
+	$cambios = array();
+	foreach ( $ids as $sid ) {
+		$s = hm_whm_service( $sid );
+		$u = strtolower( (string) $s['user'] );
+		if ( ! isset( $whm[ $u ] ) ) {
+			update_post_meta( $sid, '_hm_status', 'cancelado' );
+			hm_whm_log( $sid, 'Sincronización: la cuenta ya no existe en WHM; marcada como cancelada.' );
+			$cambios[] = $s['domain'] . ': ya no existe en WHM, marcada cancelada';
+			continue;
+		}
+		$a      = $whm[ $u ];
+		$estado = ! empty( $a['suspended'] ) ? 'suspendido' : 'activo';
+		if ( $estado !== $s['status'] ) {
+			update_post_meta( $sid, '_hm_status', $estado );
+			if ( 'suspendido' === $estado ) {
+				update_post_meta( $sid, '_hm_suspended', time() );
+			}
+			hm_whm_log( $sid, 'Sincronización: en WHM está ' . $estado . '.' );
+			$cambios[] = $s['domain'] . ': ' . $s['status'] . ' -> ' . $estado;
+		}
+		if ( (string) $a['plan'] !== (string) $s['package'] ) {
+			update_post_meta( $sid, '_hm_package', $a['plan'] );
+			hm_whm_log( $sid, 'Sincronización: paquete ' . $s['package'] . ' -> ' . $a['plan'] . '.' );
+			$cambios[] = $s['domain'] . ': paquete ' . $s['package'] . ' -> ' . $a['plan'];
+		}
+	}
+	update_option( 'hm_whm_last_sync', array( 't' => time(), 'cambios' => $cambios ), 'no' );
+	return array( 'revisadas' => count( $ids ), 'en_whm' => count( $whm ), 'cambios' => $cambios );
+}
+
+/**
+ * Inventario de solo lectura: paquetes con sus límites y uso real de cada cuenta.
+ *
+ * @return array|WP_Error
+ */
+function hm_whm_inventory() {
+	$pk = HM_WHM_API::call( 'listpkgs' );
+	if ( is_wp_error( $pk ) ) {
+		return $pk;
+	}
+	$ac = HM_WHM_API::call( 'listaccts' );
+	if ( is_wp_error( $ac ) ) {
+		return $ac;
+	}
+	$bw  = HM_WHM_API::call( 'showbw' );
+	$bwu = array();
+	if ( ! is_wp_error( $bw ) ) {
+		foreach ( (array) ( isset( $bw['acct'] ) ? $bw['acct'] : array() ) as $b ) {
+			$bwu[ $b['user'] ] = array( 'usado_mb' => round( (float) $b['totalbytes'] / 1048576, 1 ), 'limite' => isset( $b['limit'] ) ? $b['limit'] : null );
+		}
+	}
+	$keys = array( 'QUOTA', 'BWLIMIT', 'MAXPOP', 'MAXSQL', 'MAXSUB', 'MAXADDON', 'MAXPARK', 'MAXFTP', 'MAXLST', 'MAX_EMAIL_PER_HOUR', 'MAX_EMAILACCT_QUOTA', 'HASSHELL', 'CGI', 'FEATURELIST' );
+	$pkgs = array();
+	foreach ( (array) ( isset( $pk['pkg'] ) ? $pk['pkg'] : array() ) as $p ) {
+		$row = array( 'name' => $p['name'] );
+		foreach ( $keys as $k ) {
+			if ( isset( $p[ $k ] ) ) {
+				$row[ strtolower( $k ) ] = $p[ $k ];
+			}
+		}
+		$pkgs[] = $row;
+	}
+	$accts = array();
+	foreach ( (array) ( isset( $ac['acct'] ) ? $ac['acct'] : array() ) as $a ) {
+		$row = array();
+		foreach ( array( 'user', 'domain', 'plan', 'suspended', 'diskused', 'disklimit', 'inodesused', 'inodeslimit', 'maxpop', 'maxsql', 'maxsub', 'maxaddons', 'maxparked', 'maxftp', 'max_emailacct_quota', 'max_email_per_hour', 'startdate', 'theme', 'ip', 'owner' ) as $k ) {
+			if ( isset( $a[ $k ] ) ) {
+				$row[ $k ] = $a[ $k ];
+			}
+		}
+		$row['bw'] = isset( $bwu[ $a['user'] ] ) ? $bwu[ $a['user'] ] : null;
+		$accts[]   = $row;
+	}
+	return array( 'paquetes' => $pkgs, 'cuentas' => $accts, 'mes_bw' => wp_date( 'Y-m' ) );
+}
+
 function hm_whm_daily() {
+	$sync = hm_whm_reconcile(); // primero traer el estado real de WHM.
 	$ids = get_posts(
 		array(
 			'post_type'      => HM_WHM_CPT,
@@ -840,6 +941,13 @@ function hm_whm_daily() {
 	$notify  = array_map( 'intval', array_filter( array_map( 'trim', explode( ',', (string) hm_whm_opt( 'notify_days' ) ) ), 'strlen' ) );
 	rsort( $notify );
 	$summary = array();
+	if ( ! is_wp_error( $sync ) ) {
+		foreach ( $sync['cambios'] as $cm ) {
+			$summary[] = 'Sincronización WHM: ' . $cm;
+		}
+	} else {
+		$summary[] = 'ERROR al sincronizar con WHM: ' . $sync->get_error_message();
+	}
 
 	foreach ( $ids as $sid ) {
 		$s = hm_whm_service( $sid );
@@ -1469,6 +1577,26 @@ add_action(
 				'methods'             => 'GET',
 				'permission_callback' => $perm,
 				'callback'            => 'hm_whm_status',
+			)
+		);
+		register_rest_route(
+			'hm-whm/v1',
+			'/sincronizar',
+			array(
+				'methods'             => 'POST',
+				'permission_callback' => $perm,
+				'callback'            => 'hm_whm_reconcile',
+			)
+		);
+		register_rest_route(
+			'hm-whm/v1',
+			'/inventario',
+			array(
+				'methods'             => 'GET',
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+				'callback'            => 'hm_whm_inventory',
 			)
 		);
 		register_rest_route(

@@ -214,6 +214,40 @@ def importar_whm(wp, cfg):
         print(f"  ! Estas exclusiones no existen en WHM: {', '.join(faltan)}")
 
 
+def sincronizar_whm(wp):
+    step("Sincronizar WHM -> sitio")
+    base = wp.api.rsplit("/wp/v2", 1)[0]
+    r = wp.s.post(f"{base}/hm-whm/v1/sincronizar", timeout=180)
+    if r.status_code == 404:
+        print("! Falta subir hm-whm 1.3.0 (la versión instalada no sincroniza).")
+        return
+    if r.status_code >= 400:
+        fail(f"sincronizar -> {r.status_code}: {r.text[:300]}")
+        return
+    d = r.json()
+    print(f"Servicios revisados: {d['revisadas']} | cuentas en WHM: {d['en_whm']} | cambios: {len(d['cambios'])}")
+    for cm in d["cambios"]:
+        print(f"  * {cm}")
+
+
+def inventario_whm(wp):
+    """Guarda paquetes y uso real de cada cuenta en registro/inventario-whm.json (solo lectura)."""
+    step("Inventario de WHM")
+    base = wp.api.rsplit("/wp/v2", 1)[0]
+    r = wp.s.get(f"{base}/hm-whm/v1/inventario", timeout=300)
+    if r.status_code == 404:
+        print("! Falta subir hm-whm 1.3.0 (la versión instalada no tiene inventario).")
+        return
+    if r.status_code >= 400:
+        fail(f"inventario -> {r.status_code}: {r.text[:300]}")
+        return
+    d = r.json()
+    out = ROOT / "registro" / "inventario-whm.json"
+    out.parent.mkdir(exist_ok=True)
+    out.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"Paquetes: {len(d['paquetes'])} | cuentas: {len(d['cuentas'])} | guardado en registro/inventario-whm.json")
+
+
 def borrar(wp, cfg):
     step("Contenido de ejemplo a la papelera")
     for b in cfg.get("borrar") or []:
@@ -557,6 +591,9 @@ def main():
     producto(wp, cfg, publicar)
     whm(wp)
     importar_whm(wp, cfg)
+    sincronizar_whm(wp)
+    if cfg.get("inventario_whm"):
+        inventario_whm(wp)
     borrar(wp, cfg)
 
     if errors:

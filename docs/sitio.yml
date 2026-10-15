@@ -65,6 +65,9 @@ importar_whm:
   excluir: [shekhar, myeesol1, tilo, hhm, moxtec]
   aplicar: true
 
+# Guardar inventario de paquetes y uso por cuenta en registro/inventario-whm.json.
+inventario_whm: true
+
 # Plugins del directorio de WordPress.org que se instalan y activan.
 plugins:
   - woocommerce
