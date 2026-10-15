@@ -1,8 +1,8 @@
-fecha: 2026-10-15T00:12:45Z
-commit: 10b6f65c64db60d17eab57250687d4bf5172fb44
+fecha: 2026-10-15T00:45:08Z
+commit: b40fafda2256cd8d4dd6ce6617f5ed836675132b
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38658663405
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38661753535
 ---
 WP_URL: presente
 WP_USER: presente
@@ -61,8 +61,8 @@ Producto actualizado: Hosting Básico $1899 (publish) id=13 https://www.hostingm
 Enlace de compra: https://www.hostingmexico.org/finalizar-compra/?add-to-cart=13
 
 == Plugin WHM
-Plugin 1.1.0 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_web20g: existe
-Servicios: {'activo': 0, 'suspendido': 0, 'cancelado': 0} | próxima revisión diaria: 2026-10-15T09:00:00-05:00
+Plugin 1.1.0 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_hm_basico: existe
+Servicios: {'activo': 1, 'suspendido': 0, 'cancelado': 0} | próxima revisión diaria: 2026-10-15T09:00:00-05:00
 
 == Contenido de ejemplo a la papelera
 = ya en papelera: posts/1 (hello-world)
@@ -90,6 +90,7 @@ Conectado como soporte (roles: administrator) | publicar: True
 Portada: página inicio (id 19)
 Términos del checkout: página 22
 Menú actualizado (id 34)
-Encabezado actualizado (twentytwentyfive) con el menú 34
+Encabezado actualizado (twentytwentyfive) con el menú 34 y GTM GTM-5PTRT2J
+Encabezado de pago con GTM GTM-5PTRT2J
 Pie de página actualizado (twentytwentyfive)
 Modo Próximamente: no -> no
