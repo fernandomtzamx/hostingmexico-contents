@@ -1,8 +1,8 @@
-fecha: 2026-10-15T19:43:19Z
-commit: 6e99d48f985828ad2dec67498206026544a40a97
+fecha: 2026-10-15T19:50:56Z
+commit: 05e83d78eee4ea36ac2741b2acab6023ad681504
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38796075742
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38797113924
 ---
 WP_URL: presente
 WP_USER: presente
@@ -87,6 +87,9 @@ Métodos de autenticación anunciados: application-passwords
 Conectado como soporte (roles: administrator) | publicar: True
 
 == Lanzamiento (publicar: true)
+  + imagen subida: logo-hostingmexico.png (id 63)
+  + imagen subida: icono-hostingmexico.png (id 64)
+Logo del sitio: medio 63 | ícono: medio 64
 Portada: página inicio (id 19)
 Términos del checkout: página 22
 Menú actualizado (id 34)
