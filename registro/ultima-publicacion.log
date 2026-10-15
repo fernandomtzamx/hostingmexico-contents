@@ -1,8 +1,8 @@
-fecha: 2026-10-14T21:51:30Z
-commit: b2dea469842aa8ac448e8d5d23314103a101bf68
+fecha: 2026-10-15T00:11:24Z
+commit: 2644c7f64d826508ba70faada1c28be78bb8c8fa
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38643376171
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38658500674
 ---
 WP_URL: presente
 WP_USER: presente
@@ -18,7 +18,7 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 == Plugins
 = ya activo: woocommerce 11.2.1
 = ya activo: woocommerce-mercadopago 8.9.6
-! Falta el plugin hm-whm (Hosting México: WHM). Súbelo en Plugins > Añadir nuevo > Subir plugin.
+= ya activo: hm-whm 1.1.0
 
 == WooCommerce
 = woocommerce_currency: MXN
@@ -26,7 +26,7 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 = woocommerce_currency_pos: left
 = woocommerce_price_thousand_sep: ,
 = woocommerce_price_decimal_sep: .
-= woocommerce_price_num_decimals: 0
++ woocommerce_price_num_decimals: 2 -> 0
 = woocommerce_calc_taxes: no
 = woocommerce_ship_to_countries: disabled
 = woocommerce_allowed_countries: specific
@@ -50,8 +50,7 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 = página de pago sin cambios
 
 == Métodos de pago
-+ activo: woo-mercado-pago-basic (Mercado Pago) {}
-  ! ajustes no disponibles en esta versión: installments, method, auto_return, binary_mode, currency_conversion
++ activo: woo-mercado-pago-basic (Mercado Pago) {'installments': '12', 'method': 'redirect', 'auto_return': 'yes', 'binary_mode': 'no', 'currency_conversion': 'no'}
 Métodos activos: woo-mercado-pago-basic
 
 == Estilos globales
@@ -62,7 +61,9 @@ Producto actualizado: Hosting Básico $1899 (publish) id=13 https://www.hostingm
 Enlace de compra: https://www.hostingmexico.org/finalizar-compra/?add-to-cart=13
 
 == Plugin WHM
-! El plugin hm-whm no está activo todavía.
+Plugin 1.1.0 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_web20g: no existe
+Servicios: {'activo': 0, 'suspendido': 0, 'cancelado': 0} | próxima revisión diaria: 2026-10-15T09:00:00-05:00
+Crear paquete en WHM -> 200: {"ok":true,"package":"hostin30_web20g"}
 
 == Contenido de ejemplo a la papelera
 = ya en papelera: posts/1 (hello-world)
