@@ -322,9 +322,27 @@ def estilos(wp):
         fail(f"estilos: {e}")
 
 
+GTM_EN_HEAD = None
+
+
+def gtm_en_head(wp):
+    """True si el mu-plugin hostingmexico-gtm.php ya carga GTM en el <head>."""
+    global GTM_EN_HEAD
+    if GTM_EN_HEAD is None:
+        try:
+            base = wp.api.rsplit("/wp-json", 1)[0]
+            html = pub.requests.get(base + "/?hm_gtm_check=1", timeout=30,
+                                    headers={"User-Agent": "hostingmexico-agente/1.1", "Cache-Control": "no-cache"}).text
+            GTM_EN_HEAD = "<!-- hm-gtm: head -->" in html
+        except Exception:  # noqa: BLE001
+            GTM_EN_HEAD = False
+    return GTM_EN_HEAD
+
+
 def gtm_block(gtm_id):
-    """Bloque HTML con Google Tag Manager (script + noscript) para el inicio del encabezado."""
-    if not gtm_id:
+    """Bloque HTML con Google Tag Manager (script + noscript) para el inicio del encabezado.
+    Es el respaldo mientras no esté instalado el mu-plugin que lo pone en el <head>."""
+    if not gtm_id or GTM_EN_HEAD:
         return ""
     if not re.fullmatch(r"GTM-[A-Z0-9]{4,12}", str(gtm_id)):
         fail(f"ID de GTM inválido: {gtm_id}")
@@ -395,6 +413,8 @@ def lanzamiento(wp, cfg):
             buy = wp.buy_url((cfg.get("producto") or {}).get("slug", pub.PRODUCTO_COMPRAR))
         except Exception:  # noqa: BLE001
             buy = "/tienda/"
+        en_head = gtm_en_head(wp) if cfg.get("gtm") else False
+        print(f"GTM: {'en el <head> con el mu-plugin' if en_head else 'respaldo en el encabezado (falta subir wordpress/mu-plugins/hostingmexico-gtm.php)'}")
         header = gtm_block(cfg.get("gtm")) + (
             '<!-- wp:group {"align":"full","layout":{"type":"default"}} -->\n<div class="wp-block-group alignfull">'
             '<!-- wp:group {"layout":{"type":"constrained"}} -->\n<div class="wp-block-group">'
@@ -411,7 +431,7 @@ def lanzamiento(wp, cfg):
         )
         if theme:
             wp.req("POST", f"template-parts/{theme}//header", json={"content": header})
-            print(f"Encabezado actualizado ({theme}) con el menú {menu_id}" + (f" y GTM {cfg.get('gtm')}" if cfg.get("gtm") else ""))
+            print(f"Encabezado actualizado ({theme}) con el menú {menu_id}" + (f" y GTM {cfg.get('gtm')}" if cfg.get("gtm") and not en_head else ""))
     except Exception as e:  # noqa: BLE001
         fail(f"menú/encabezado: {e}")
 
@@ -421,8 +441,10 @@ def lanzamiento(wp, cfg):
             tid = "woocommerce/woocommerce//checkout-header"
             raw = wp.req("GET", f"template-parts/{tid}", params={"context": "edit"})["content"]["raw"]
             limpio = re.sub(r"<!-- wp:html -->\s*<!-- Google Tag Manager -->.*?<!-- /wp:html -->\s*", "", raw, flags=re.S)
-            wp.req("POST", f"template-parts/{tid}", json={"content": gtm_block(cfg["gtm"]) + limpio})
-            print(f"Encabezado de pago con GTM {cfg['gtm']}")
+            nuevo = gtm_block(cfg["gtm"]) + limpio
+            if nuevo != raw:
+                wp.req("POST", f"template-parts/{tid}", json={"content": nuevo})
+            print("Encabezado de pago: " + ("sin bloque de GTM (lo carga el mu-plugin)" if GTM_EN_HEAD else f"con GTM {cfg['gtm']}"))
         except Exception as e:  # noqa: BLE001
             fail(f"GTM en encabezado de pago: {e}")
 

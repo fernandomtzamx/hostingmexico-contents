@@ -8,5 +8,5 @@ Este repo alimenta hostingmexico.org, un sitio que vende un solo plan de hosting
 - Precio, especificaciones y políticas (7 días de gracia, 30 días de garantía, avisos 15/3/0 días) deben coincidir entre páginas, producto y plugin. Si cambias uno, cambia todos.
 - Idioma: español de México. No usar guión largo (—) en los textos.
 - Después de cada push, `git pull` y leer `registro/ultima-publicacion.log` para confirmar el resultado.
-- El plugin hm-whm y el mu-plugin agente-auth no se despliegan por el workflow: si cambian, el usuario debe volver a subirlos.
+- El plugin hm-whm y los mu-plugins (agente-auth, hostingmexico-gtm) no se despliegan por el workflow: si cambian, el usuario debe volver a subirlos.
 - Nunca pedir ni guardar tokens o contraseñas en el repo: van en los secretos de GitHub o en wp-config.php.
