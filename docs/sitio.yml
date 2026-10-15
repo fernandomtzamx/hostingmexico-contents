@@ -7,6 +7,9 @@
 #        y quita el modo "Próximamente" de WooCommerce.
 publicar: true
 
+# Google Tag Manager: se inserta al inicio del encabezado en todas las páginas.
+gtm: GTM-5PTRT2J
+
 sitio:
   title: "Hosting México"
   description: "Hosting con cPanel, SSL gratis y soporte en español"

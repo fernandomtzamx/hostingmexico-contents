@@ -322,6 +322,27 @@ def estilos(wp):
         fail(f"estilos: {e}")
 
 
+def gtm_block(gtm_id):
+    """Bloque HTML con Google Tag Manager (script + noscript) para el inicio del encabezado."""
+    if not gtm_id:
+        return ""
+    if not re.fullmatch(r"GTM-[A-Z0-9]{4,12}", str(gtm_id)):
+        fail(f"ID de GTM inválido: {gtm_id}")
+        return ""
+    return (
+        '<!-- wp:html -->\n'
+        '<!-- Google Tag Manager -->\n'
+        "<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});"
+        "var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;"
+        "j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);"
+        f"}})(window,document,'script','dataLayer','{gtm_id}');</script>\n"
+        f'<noscript><iframe src="https://www.googletagmanager.com/ns.html?id={gtm_id}" height="0" width="0" '
+        'style="display:none;visibility:hidden"></iframe></noscript>\n'
+        '<!-- End Google Tag Manager -->\n'
+        '<!-- /wp:html -->\n'
+    )
+
+
 def nav_links(items):
     out = []
     for it in items:
@@ -374,7 +395,7 @@ def lanzamiento(wp, cfg):
             buy = wp.buy_url((cfg.get("producto") or {}).get("slug", pub.PRODUCTO_COMPRAR))
         except Exception:  # noqa: BLE001
             buy = "/tienda/"
-        header = (
+        header = gtm_block(cfg.get("gtm")) + (
             '<!-- wp:group {"align":"full","layout":{"type":"default"}} -->\n<div class="wp-block-group alignfull">'
             '<!-- wp:group {"layout":{"type":"constrained"}} -->\n<div class="wp-block-group">'
             '<!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|30"}}},"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between"}} -->\n'
@@ -390,9 +411,20 @@ def lanzamiento(wp, cfg):
         )
         if theme:
             wp.req("POST", f"template-parts/{theme}//header", json={"content": header})
-            print(f"Encabezado actualizado ({theme}) con el menú {menu_id}")
+            print(f"Encabezado actualizado ({theme}) con el menú {menu_id}" + (f" y GTM {cfg.get('gtm')}" if cfg.get("gtm") else ""))
     except Exception as e:  # noqa: BLE001
         fail(f"menú/encabezado: {e}")
+
+    # GTM también en el encabezado simplificado de la página de pago de WooCommerce.
+    if cfg.get("gtm"):
+        try:
+            tid = "woocommerce/woocommerce//checkout-header"
+            raw = wp.req("GET", f"template-parts/{tid}", params={"context": "edit"})["content"]["raw"]
+            limpio = re.sub(r"<!-- wp:html -->\s*<!-- Google Tag Manager -->.*?<!-- /wp:html -->\s*", "", raw, flags=re.S)
+            wp.req("POST", f"template-parts/{tid}", json={"content": gtm_block(cfg["gtm"]) + limpio})
+            print(f"Encabezado de pago con GTM {cfg['gtm']}")
+        except Exception as e:  # noqa: BLE001
+            fail(f"GTM en encabezado de pago: {e}")
 
     # Pie de página del tema activo
     try:
