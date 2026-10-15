@@ -1,8 +1,8 @@
-fecha: 2026-10-15T19:31:29Z
-commit: 7a595f7018317e5740287066ae874e7ffc897db5
+fecha: 2026-10-15T19:43:19Z
+commit: 6e99d48f985828ad2dec67498206026544a40a97
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38794529142
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38796075742
 ---
 WP_URL: presente
 WP_USER: presente
@@ -90,8 +90,8 @@ Conectado como soporte (roles: administrator) | publicar: True
 Portada: página inicio (id 19)
 Términos del checkout: página 22
 Menú actualizado (id 34)
-GTM: respaldo en el encabezado (falta subir wordpress/mu-plugins/hostingmexico-gtm.php)
-Encabezado actualizado (twentytwentyfive) con el menú 34 y GTM GTM-5PTRT2J
-Encabezado de pago: con GTM GTM-5PTRT2J
+GTM: en el <head> con el mu-plugin
+Encabezado actualizado (twentytwentyfive) con el menú 34
+Encabezado de pago: sin bloque de GTM (lo carga el mu-plugin)
 Pie de página actualizado (twentytwentyfive)
 Modo Próximamente: no -> no
