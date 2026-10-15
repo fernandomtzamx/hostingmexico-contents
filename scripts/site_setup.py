@@ -418,24 +418,18 @@ def lanzamiento(wp, cfg):
     except Exception as e:  # noqa: BLE001
         fail(f"pie de página: {e}")
 
-    # Quitar el modo "Próximamente" de WooCommerce
+    # Quitar el modo "Próximamente" de WooCommerce (opción woocommerce_coming_soon vía wc-admin/options).
     try:
-        path = "wc/v3/settings/site-visibility/woocommerce_coming_soon"
-        antes = wp.wc("GET", path).get("value")
+        q = "wc-admin/options?options=woocommerce_coming_soon,woocommerce_store_pages_only"
+        antes = wp.wc("GET", q).get("woocommerce_coming_soon")
         if antes != "no":
-            wp.wc("PUT", path, json={"value": "no"})
-        despues = wp.wc("GET", path).get("value")
-        print(f"Modo Próximamente: {antes} -> {despues}" + ("  (se había vuelto a activar)" if antes == "yes" else ""))
+            wp.wc("POST", "wc-admin/options", json={"woocommerce_coming_soon": "no"})
+        despues = wp.wc("GET", q).get("woocommerce_coming_soon")
+        print(f"Modo Próximamente: {antes} -> {despues}")
         if despues != "no":
             fail("el modo Próximamente sigue activo; desactívalo en WooCommerce > Ajustes > Visibilidad del sitio")
     except Exception as e:  # noqa: BLE001
-        try:
-            wp.req("POST", "settings", json={"woocommerce_coming_soon": "no"})
-            print("Tienda visible: modo Próximamente desactivado")
-        except Exception:  # noqa: BLE001
-            print(f"! No pude desactivar 'Próximamente' por API ({str(e)[:120]}). "
-                  "Hazlo en WooCommerce > Ajustes > Visibilidad del sitio.")
-
+        fail(f"modo Próximamente: {e}. Desactívalo en WooCommerce > Ajustes > Visibilidad del sitio.")
 
 def main():
     cfg = yaml.safe_load((ROOT / "docs" / "sitio.yml").read_text(encoding="utf-8"))
