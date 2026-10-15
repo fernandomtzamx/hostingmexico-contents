@@ -1,8 +1,8 @@
-fecha: 2026-10-15T20:00:20Z
-commit: 923814734c60813a55515aea0b4d71ebc1824051
+fecha: 2026-10-15T20:04:27Z
+commit: f25fd22373fba1f3ddf251c1acb9ad6e69871190
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38798357140
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38798918656
 ---
 WP_URL: presente
 WP_USER: presente
@@ -18,7 +18,7 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 == Plugins
 = ya activo: woocommerce 11.2.1
 = ya activo: woocommerce-mercadopago 8.9.6
-= ya activo: hm-whm 1.1.0
+= ya activo: hm-whm 1.2.0
 
 == WooCommerce
 = woocommerce_currency: MXN
@@ -61,11 +61,23 @@ Producto actualizado: Hosting Básico $1899 (publish) id=13 https://www.hostingm
 Enlace de compra: https://www.hostingmexico.org/finalizar-compra/?add-to-cart=13
 
 == Plugin WHM
-Plugin 1.1.0 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_hm_basico: existe
+Plugin 1.2.0 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_hm_basico: existe
 Servicios: {'activo': 1, 'suspendido': 0, 'cancelado': 0} | próxima revisión diaria: 2026-10-16T09:00:00-05:00
 
 == Importar cuentas de WHM
-! Falta subir hm-whm 1.2.0 (la versión instalada no tiene la importación).
+Usuario: soporte | importadas: 11 | ya registradas: 0 | excluidas: 5
+  + publimerca publimerca.com                      activo     paquete hostin30_Bronce
+  + skmeimx    skmei.com.mx                        activo     paquete hostin30_Silver
+  + hostin30   hostingmexico.org                   activo     paquete Reseller Tier 3
+  + ugaxcom    ugax.com                            activo     paquete hostin30_hm_1
+  + fernandomartinez fernandomartinez.mx                 activo     paquete undefined
+  + seminuevos seminuevos.net                      activo     paquete undefined
+  + martech    martech.mx                          activo     paquete hostin30_hm_1
+  + garantias  garantias.net                       activo     paquete hostin30_Bronce
+  + publi20    publi20.com                         activo     paquete hostin30_Web 20g
+  + inboundcommx inbound.com.mx                      activo     paquete undefined
+  + ubicaweb   ubicaweb.com                        activo     paquete hostin30_Silver
+  Excluidas: myeesol1, moxtec, tilo, hhm, shekhar
 
 == Contenido de ejemplo a la papelera
 = ya en papelera: posts/1 (hello-world)
