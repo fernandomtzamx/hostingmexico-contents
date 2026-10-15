@@ -187,6 +187,33 @@ def whm(wp):
         print(f"Crear paquete en WHM -> {r.status_code}: {r.text[:200]}")
 
 
+def importar_whm(wp, cfg):
+    imp = cfg.get("importar_whm")
+    if not imp:
+        return
+    step("Importar cuentas de WHM")
+    base = wp.api.rsplit("/wp/v2", 1)[0]
+    r = wp.s.post(f"{base}/hm-whm/v1/importar", timeout=180, json={
+        "usuario": imp.get("usuario", "soporte"), "excluir": imp.get("excluir") or [], "aplicar": bool(imp.get("aplicar"))})
+    if r.status_code == 404:
+        print("! Falta subir hm-whm 1.2.0 (la versión instalada no tiene la importación).")
+        return
+    if r.status_code >= 400:
+        fail(f"importar -> {r.status_code}: {r.text[:300]}")
+        return
+    d = r.json()
+    modo = "importadas" if d.get("aplicado") else "se importarían (simulación)"
+    print(f"Usuario: {d['usuario']} | {modo}: {len(d['importadas'])} | ya registradas: {len(d['ya_registradas'])} | excluidas: {len(d['excluidas'])}")
+    for f in d["importadas"]:
+        print(f"  + {f['usuario']:10} {f['dominio']:35} {f['estado']:10} paquete {f['paquete']}" + (f"  ERROR {f['error']}" if f.get("error") else ""))
+    for f in d["ya_registradas"]:
+        print(f"  = {f}")
+    print(f"  Excluidas: {', '.join(d['excluidas']) or 'ninguna'}")
+    faltan = [e for e in (imp.get("excluir") or []) if e.lower() not in d["excluidas"]]
+    if faltan:
+        print(f"  ! Estas exclusiones no existen en WHM: {', '.join(faltan)}")
+
+
 def borrar(wp, cfg):
     step("Contenido de ejemplo a la papelera")
     for b in cfg.get("borrar") or []:
@@ -529,6 +556,7 @@ def main():
     estilos(wp)
     producto(wp, cfg, publicar)
     whm(wp)
+    importar_whm(wp, cfg)
     borrar(wp, cfg)
 
     if errors:

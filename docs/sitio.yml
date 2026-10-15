@@ -57,6 +57,14 @@ pagos:
       currency_conversion: "no"
   desactivar: [bacs, cheque, cod, woo-mercado-pago-custom, woo-mercado-pago-ticket, woo-mercado-pago-credits, woo-mercado-pago-pix, woo-mercado-pago-pse, woo-mercado-pago-yape]
 
+# Importar a WordPress las cuentas que ya existen en WHM (no modifica WHM).
+# Quedan asignadas a "usuario" en gestión manual: sin avisos ni suspensiones automáticas.
+# Es idempotente: las ya registradas no se duplican.
+importar_whm:
+  usuario: soporte
+  excluir: [shekhar, myeesol1, tilo, hhm, moxtec]
+  aplicar: true
+
 # Plugins del directorio de WordPress.org que se instalan y activan.
 plugins:
   - woocommerce

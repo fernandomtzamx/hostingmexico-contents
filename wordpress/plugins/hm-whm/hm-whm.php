@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Hosting México: WHM
  * Description:       Vende hosting con WooCommerce: crea la cuenta cPanel al confirmarse el pago, avisa de renovaciones, suspende por falta de pago y reactiva al renovar, todo vía la API de WHM.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'HM_WHM_VERSION', '1.1.0' );
+define( 'HM_WHM_VERSION', '1.2.0' );
 define( 'HM_WHM_FILE', __FILE__ );
 define( 'HM_WHM_CPT', 'hm_servicio' );
 
@@ -843,8 +843,8 @@ function hm_whm_daily() {
 
 	foreach ( $ids as $sid ) {
 		$s = hm_whm_service( $sid );
-		if ( ! $s || ! $s['expires'] ) {
-			continue;
+		if ( ! $s || ! $s['expires'] || 'manual' === get_post_meta( $sid, '_hm_gestion', true ) ) {
+			continue; // las cuentas importadas en gestión manual no reciben avisos ni suspensiones.
 		}
 		$days = (int) floor( ( $s['expires'] - $now ) / DAY_IN_SECONDS );
 
@@ -980,7 +980,9 @@ add_action(
 			if ( 'activo' === $s['status'] ) {
 				echo '<a class="button" href="' . esc_url( $sso ) . '" target="_blank" rel="noopener">Entrar a cPanel</a> ';
 			}
-			echo '<a class="button" href="' . esc_url( $renew ) . '">Renovar</a>';
+			if ( 'manual' !== get_post_meta( $sid, '_hm_gestion', true ) ) {
+				echo '<a class="button" href="' . esc_url( $renew ) . '">Renovar</a>';
+			}
 			echo '</td></tr>';
 		}
 		echo '</tbody></table>';
@@ -1115,6 +1117,7 @@ function hm_whm_metabox( $post ) {
 	echo '<tr><th>Estado</th><td>' . esc_html( isset( $hm_whm_status_labels[ $s['status'] ] ) ? $hm_whm_status_labels[ $s['status'] ] : $s['status'] ) . '</td></tr>';
 	echo '<tr><th>Vence</th><td>' . esc_html( hm_whm_date( $s['expires'] ) ) . '</td></tr>';
 	echo '<tr><th>Correo</th><td>' . esc_html( $s['email'] ) . '</td></tr>';
+	echo '<tr><th>Gestión</th><td>' . ( 'manual' === get_post_meta( $post->ID, '_hm_gestion', true ) ? 'Manual (importada de WHM: sin avisos ni suspensiones automáticas)' : 'Automática' ) . '</td></tr>';
 	echo '<tr><th>Pedido original</th><td>' . ( $order ? '<a href="' . esc_url( $order->get_edit_order_url() ) . '">#' . esc_html( $order->get_order_number() ) . '</a>' : '-' ) . '</td></tr>';
 	echo '</tbody></table><p>';
 	$acts = array(
@@ -1377,6 +1380,82 @@ function hm_whm_status() {
 	return $out;
 }
 
+/**
+ * Registra en WordPress las cuentas que ya existen en WHM y las asigna a un usuario.
+ * No modifica nada en WHM. Las cuentas quedan en gestión manual (sin avisos ni suspensiones).
+ *
+ * @return array|WP_Error
+ */
+function hm_whm_import( $login, array $excluir, $aplicar ) {
+	$user = get_user_by( 'login', $login );
+	if ( ! $user ) {
+		return new WP_Error( 'hm_whm_import', 'No existe el usuario de WordPress "' . $login . '".' );
+	}
+	$data = HM_WHM_API::call( 'listaccts', array( 'want' => 'user,domain,plan,suspended,unix_startdate,email' ) );
+	if ( is_wp_error( $data ) ) {
+		return $data;
+	}
+	$excluir = array_map( 'strtolower', array_map( 'trim', $excluir ) );
+	$out     = array( 'usuario' => $login, 'aplicado' => (bool) $aplicar, 'importadas' => array(), 'ya_registradas' => array(), 'excluidas' => array() );
+	foreach ( (array) ( isset( $data['acct'] ) ? $data['acct'] : array() ) as $a ) {
+		$u = strtolower( (string) $a['user'] );
+		if ( in_array( $u, $excluir, true ) ) {
+			$out['excluidas'][] = $u;
+			continue;
+		}
+		$existing = hm_whm_services_by( '_hm_user', $a['user'] );
+		if ( $existing ) {
+			$sid = (int) $existing[0];
+			if ( $aplicar && (int) get_post_meta( $sid, '_hm_customer', true ) !== (int) $user->ID && 'manual' === get_post_meta( $sid, '_hm_gestion', true ) ) {
+				update_post_meta( $sid, '_hm_customer', $user->ID );
+			}
+			$out['ya_registradas'][] = $u . ' (' . $a['domain'] . ')';
+			continue;
+		}
+		$start   = ! empty( $a['unix_startdate'] ) ? (int) $a['unix_startdate'] : time();
+		$expires = $start;
+		while ( $expires <= time() ) {
+			$expires = strtotime( '+1 year', $expires ); // próximo aniversario: solo informativo.
+		}
+		$fila = array(
+			'usuario'    => $u,
+			'dominio'    => $a['domain'],
+			'paquete'    => $a['plan'],
+			'estado'     => ! empty( $a['suspended'] ) ? 'suspendido' : 'activo',
+			'aniversario' => wp_date( 'Y-m-d', $expires ),
+		);
+		if ( $aplicar ) {
+			$sid = wp_insert_post( array( 'post_type' => HM_WHM_CPT, 'post_status' => 'publish', 'post_title' => $a['domain'] ), true );
+			if ( is_wp_error( $sid ) ) {
+				$fila['error'] = $sid->get_error_message();
+				$out['importadas'][] = $fila;
+				continue;
+			}
+			foreach (
+				array(
+					'_hm_domain'   => hm_whm_clean_domain( $a['domain'] ),
+					'_hm_user'     => $a['user'],
+					'_hm_package'  => $a['plan'],
+					'_hm_expires'  => $expires,
+					'_hm_status'   => $fila['estado'],
+					'_hm_customer' => $user->ID,
+					'_hm_email'    => $user->user_email,
+					'_hm_order'    => 0,
+					'_hm_product'  => 0,
+					'_hm_gestion'  => 'manual',
+					'_hm_contacto_whm' => isset( $a['email'] ) ? $a['email'] : '',
+				) as $k => $v
+			) {
+				update_post_meta( $sid, $k, $v );
+			}
+			hm_whm_log( $sid, 'Importada desde WHM y asignada a ' . $login . ' (gestión manual).' );
+			$fila['id'] = $sid;
+		}
+		$out['importadas'][] = $fila;
+	}
+	return $out;
+}
+
 add_action(
 	'rest_api_init',
 	function () {
@@ -1390,6 +1469,23 @@ add_action(
 				'methods'             => 'GET',
 				'permission_callback' => $perm,
 				'callback'            => 'hm_whm_status',
+			)
+		);
+		register_rest_route(
+			'hm-whm/v1',
+			'/importar',
+			array(
+				'methods'             => 'POST',
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+				'callback'            => function ( WP_REST_Request $r ) {
+					return hm_whm_import(
+						sanitize_user( (string) $r->get_param( 'usuario' ) ),
+						array_map( 'sanitize_user', (array) $r->get_param( 'excluir' ) ),
+						(bool) $r->get_param( 'aplicar' )
+					);
+				},
 			)
 		);
 		register_rest_route(
