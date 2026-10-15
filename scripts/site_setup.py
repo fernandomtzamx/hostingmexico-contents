@@ -420,8 +420,14 @@ def lanzamiento(wp, cfg):
 
     # Quitar el modo "Próximamente" de WooCommerce
     try:
-        wp.wc("PUT", "wc/v3/settings/site-visibility/woocommerce_coming_soon", json={"value": "no"})
-        print("Tienda visible: modo Próximamente desactivado")
+        path = "wc/v3/settings/site-visibility/woocommerce_coming_soon"
+        antes = wp.wc("GET", path).get("value")
+        if antes != "no":
+            wp.wc("PUT", path, json={"value": "no"})
+        despues = wp.wc("GET", path).get("value")
+        print(f"Modo Próximamente: {antes} -> {despues}" + ("  (se había vuelto a activar)" if antes == "yes" else ""))
+        if despues != "no":
+            fail("el modo Próximamente sigue activo; desactívalo en WooCommerce > Ajustes > Visibilidad del sitio")
     except Exception as e:  # noqa: BLE001
         try:
             wp.req("POST", "settings", json={"woocommerce_coming_soon": "no"})
