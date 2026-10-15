@@ -1,8 +1,8 @@
-fecha: 2026-10-15T19:50:56Z
-commit: 05e83d78eee4ea36ac2741b2acab6023ad681504
+fecha: 2026-10-15T20:00:20Z
+commit: 923814734c60813a55515aea0b4d71ebc1824051
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38797113924
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38798357140
 ---
 WP_URL: presente
 WP_USER: presente
@@ -64,6 +64,9 @@ Enlace de compra: https://www.hostingmexico.org/finalizar-compra/?add-to-cart=13
 Plugin 1.1.0 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_hm_basico: existe
 Servicios: {'activo': 1, 'suspendido': 0, 'cancelado': 0} | próxima revisión diaria: 2026-10-16T09:00:00-05:00
 
+== Importar cuentas de WHM
+! Falta subir hm-whm 1.2.0 (la versión instalada no tiene la importación).
+
 == Contenido de ejemplo a la papelera
 = ya en papelera: posts/1 (hello-world)
 = ya en papelera: pages/2 (sample-page)
@@ -87,8 +90,8 @@ Métodos de autenticación anunciados: application-passwords
 Conectado como soporte (roles: administrator) | publicar: True
 
 == Lanzamiento (publicar: true)
-  + imagen subida: logo-hostingmexico.png (id 63)
-  + imagen subida: icono-hostingmexico.png (id 64)
+  = imagen reutilizada: logo-hostingmexico (id 63)
+  = imagen reutilizada: icono-hostingmexico (id 64)
 Logo del sitio: medio 63 | ícono: medio 64
 Portada: página inicio (id 19)
 Términos del checkout: página 22
