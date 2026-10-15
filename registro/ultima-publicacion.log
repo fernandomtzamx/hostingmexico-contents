@@ -1,8 +1,8 @@
-fecha: 2026-10-15T00:45:08Z
-commit: b40fafda2256cd8d4dd6ce6617f5ed836675132b
+fecha: 2026-10-15T19:31:29Z
+commit: 7a595f7018317e5740287066ae874e7ffc897db5
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38661753535
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38794529142
 ---
 WP_URL: presente
 WP_USER: presente
@@ -62,7 +62,7 @@ Enlace de compra: https://www.hostingmexico.org/finalizar-compra/?add-to-cart=13
 
 == Plugin WHM
 Plugin 1.1.0 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_hm_basico: existe
-Servicios: {'activo': 1, 'suspendido': 0, 'cancelado': 0} | próxima revisión diaria: 2026-10-15T09:00:00-05:00
+Servicios: {'activo': 1, 'suspendido': 0, 'cancelado': 0} | próxima revisión diaria: 2026-10-16T09:00:00-05:00
 
 == Contenido de ejemplo a la papelera
 = ya en papelera: posts/1 (hello-world)
@@ -90,7 +90,8 @@ Conectado como soporte (roles: administrator) | publicar: True
 Portada: página inicio (id 19)
 Términos del checkout: página 22
 Menú actualizado (id 34)
+GTM: respaldo en el encabezado (falta subir wordpress/mu-plugins/hostingmexico-gtm.php)
 Encabezado actualizado (twentytwentyfive) con el menú 34 y GTM GTM-5PTRT2J
-Encabezado de pago con GTM GTM-5PTRT2J
+Encabezado de pago: con GTM GTM-5PTRT2J
 Pie de página actualizado (twentytwentyfive)
 Modo Próximamente: no -> no
