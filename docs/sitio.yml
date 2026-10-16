@@ -65,7 +65,7 @@ paquete_especial:
   nombre: hm_especial
   alcance: todas
   aplicar: true
-  omitir_reducciones: true
+  omitir_reducciones: false
   limites:
     quota: 20480            # MB (20 GB)
     bwlimit: 256000         # MB/mes (250 GB)
