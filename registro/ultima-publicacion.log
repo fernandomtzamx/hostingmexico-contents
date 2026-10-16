@@ -1,8 +1,8 @@
-fecha: 2026-10-16T19:06:08Z
-commit: 01798398e19d02a55805bc3227b78a19f316ac5e
+fecha: 2026-10-16T19:08:30Z
+commit: 8ae8e026671943124def9aaba3ab3c5847275858
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38952326198
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38952582323
 ---
 WP_URL: presente
 WP_USER: presente
@@ -18,7 +18,7 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 == Plugins
 = ya activo: woocommerce 11.2.1
 = ya activo: woocommerce-mercadopago 8.9.6
-= ya activo: hm-whm 1.4.0
+= ya activo: hm-whm 1.4.1
 
 == WooCommerce
 = woocommerce_currency: MXN
@@ -61,11 +61,11 @@ Producto actualizado: Hosting Básico $1899 (publish) id=13 https://www.hostingm
 Enlace de compra: https://www.hostingmexico.org/finalizar-compra/?add-to-cart=13
 
 == Plugin WHM
-Plugin 1.4.0 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_hm_basico: existe
+Plugin 1.4.1 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_hm_basico: existe
 Servicios: {'activo': 11, 'suspendido': 0, 'cancelado': 1} | próxima revisión diaria: 2026-10-17T09:00:00-05:00
 
 == Paquete especial
-Aplicado hostin30_hm_especial: cuentas 10 | movidas 0 | ya estaban 10 | con reducciones 0 (omitidas 0) | errores 0
+Aplicado hostin30_hm_especial: cuentas 15 | movidas 4 | ya estaban 10 | con reducciones 1 (omitidas 1) | errores 0
 
 == Sincronizar WHM -> sitio
 Servicios revisados: 11 | cuentas en WHM: 16 | cambios: 0
