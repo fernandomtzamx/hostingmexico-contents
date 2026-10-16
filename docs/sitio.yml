@@ -59,7 +59,7 @@ pagos:
 
 # Importar a WordPress las cuentas que ya existen en WHM (no modifica WHM).
 # Quedan asignadas a "usuario" en gestión manual: sin avisos ni suspensiones automáticas.
-# Es idempotente: las ya registradas no se duplican. Última ejecución solicitada: 2026-10-16 10:49.
+# Es idempotente: las ya registradas no se duplican. Última ejecución solicitada: 2026-10-16 12:56.
 importar_whm:
   usuario: soporte
   excluir: [shekhar, myeesol1, tilo, hhm, moxtec]
