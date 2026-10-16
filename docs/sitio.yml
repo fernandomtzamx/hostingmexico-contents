@@ -63,9 +63,9 @@ pagos:
 # no se mueven y quedan reportadas en el correo del administrador.
 paquete_especial:
   nombre: hm_especial
-  alcance: todas
+  alcance: importadas
   aplicar: true
-  omitir_reducciones: false
+  omitir_reducciones: true
   limites:
     quota: 20480            # MB (20 GB)
     bwlimit: 256000         # MB/mes (250 GB)
