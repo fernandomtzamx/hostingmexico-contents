@@ -57,19 +57,13 @@ pagos:
       currency_conversion: "no"
   desactivar: [bacs, cheque, cod, woo-mercado-pago-custom, woo-mercado-pago-ticket, woo-mercado-pago-credits, woo-mercado-pago-pix, woo-mercado-pago-pse, woo-mercado-pago-yape]
 
-# Importar a WordPress las cuentas que ya existen en WHM (no modifica WHM).
-# Quedan asignadas a "usuario" en gestión manual: sin avisos ni suspensiones automáticas.
-# Es idempotente: las ya registradas no se duplican. Última ejecución solicitada: 2026-10-16 12:56.
-importar_whm:
-  usuario: soporte
-  excluir: [shekhar, myeesol1, tilo, hhm, moxtec]
-  aplicar: true
-
-# Paquete especial para las cuentas importadas (gestión manual), excepto la del revendedor.
+# Paquete especial. alcance: importadas (cuentas de gestión manual) | todas (todas las de WHM).
+# Siempre se excluye la cuenta del revendedor.
 # No se vende en la tienda. Con omitir_reducciones, las cuentas que perderían algún límite
 # no se mueven y quedan reportadas en el correo del administrador.
 paquete_especial:
   nombre: hm_especial
+  alcance: todas
   aplicar: true
   omitir_reducciones: true
   limites:

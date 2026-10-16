@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Hosting México: WHM
  * Description:       Vende hosting con WooCommerce: crea la cuenta cPanel al confirmarse el pago, avisa de renovaciones, suspende por falta de pago y reactiva al renovar, todo vía la API de WHM.
- * Version:           1.4.0
+ * Version:           1.4.1
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'HM_WHM_VERSION', '1.4.0' );
+define( 'HM_WHM_VERSION', '1.4.1' );
 define( 'HM_WHM_FILE', __FILE__ );
 define( 'HM_WHM_CPT', 'hm_servicio' );
 
@@ -1571,7 +1571,7 @@ function hm_whm_import( $login, array $excluir, $aplicar ) {
  *
  * @return array|WP_Error
  */
-function hm_whm_paquete_especial( $base, array $limites, $aplicar, $omitir_reducciones = true ) {
+function hm_whm_paquete_especial( $base, array $limites, $aplicar, $omitir_reducciones = true, $alcance = 'importadas' ) {
 	$base = sanitize_key( $base );
 	if ( '' === $base ) {
 		return new WP_Error( 'hm_whm_especial', 'Falta el nombre del paquete.' );
@@ -1601,6 +1601,23 @@ function hm_whm_paquete_especial( $base, array $limites, $aplicar, $omitir_reduc
 			),
 		)
 	);
+	// Objetivos: usuario WHM => id del servicio en el sitio (0 si no está registrado).
+	$objetivos = array();
+	if ( 'todas' === $alcance ) {
+		foreach ( array_keys( $whm ) as $u ) {
+			$objetivos[ $u ] = 0;
+		}
+		foreach ( hm_whm_services_by( '_hm_status', array( 'activo', 'suspendido' ) ) as $sid_any ) {
+			$uu = strtolower( (string) get_post_meta( $sid_any, '_hm_user', true ) );
+			if ( isset( $objetivos[ $uu ] ) ) {
+				$objetivos[ $uu ] = (int) $sid_any;
+			}
+		}
+	} else {
+		foreach ( $ids as $sid_m ) {
+			$objetivos[ strtolower( (string) get_post_meta( $sid_m, '_hm_user', true ) ) ] = (int) $sid_m;
+		}
+	}
 	$num = function ( $v ) {
 		$v = strtolower( (string) $v );
 		if ( '' === $v || 'unlimited' === $v || '*unknown*' === $v ) {
@@ -1611,9 +1628,13 @@ function hm_whm_paquete_especial( $base, array $limites, $aplicar, $omitir_reduc
 	$mapa = array( 'quota' => 'disklimit', 'maxpop' => 'maxpop', 'maxsql' => 'maxsql', 'maxsub' => 'maxsub', 'maxftp' => 'maxftp', 'maxaddon' => 'maxaddons', 'maxpark' => 'maxparked' );
 	$filas = array();
 	$res   = array( 'paquete' => $pkg, 'aplicado' => (bool) $aplicar, 'cuentas' => 0, 'con_reducciones' => 0, 'movidas' => 0, 'omitidas' => 0, 'errores' => 0, 'ya_en_paquete' => 0 );
-	foreach ( $ids as $sid ) {
-		$u = strtolower( (string) get_post_meta( $sid, '_hm_user', true ) );
+	$plan_tienda = HM_WHM_API::package_name();
+	foreach ( $objetivos as $u => $sid ) {
 		if ( $u === $reseller || ! isset( $whm[ $u ] ) ) {
+			continue;
+		}
+		// Nunca tocar cuentas vendidas por la tienda (plan de la tienda o gestión automática).
+		if ( $whm[ $u ]['plan'] === $plan_tienda || ( $sid && 'manual' !== get_post_meta( $sid, '_hm_gestion', true ) ) ) {
 			continue;
 		}
 		$a = $whm[ $u ];
@@ -1660,8 +1681,10 @@ function hm_whm_paquete_especial( $base, array $limites, $aplicar, $omitir_reduc
 					$fila = $filas_pre . ' | ERROR: ' . $r->get_error_message();
 				} else {
 					$res['movidas']++;
-					update_post_meta( $sid, '_hm_package', $pkg );
-					hm_whm_log( $sid, 'Paquete cambiado en WHM: ' . $a['plan'] . ' -> ' . $pkg . '.' );
+					if ( $sid ) {
+						update_post_meta( $sid, '_hm_package', $pkg );
+						hm_whm_log( $sid, 'Paquete cambiado en WHM: ' . $a['plan'] . ' -> ' . $pkg . '.' );
+					}
 					$fila .= ' | OK';
 				}
 			}
@@ -1700,7 +1723,7 @@ add_action(
 					return current_user_can( 'manage_options' );
 				},
 				'callback'            => function ( WP_REST_Request $r ) {
-					return hm_whm_paquete_especial( (string) $r->get_param( 'paquete' ), (array) $r->get_param( 'limites' ), (bool) $r->get_param( 'aplicar' ), false !== $r->get_param( 'omitir_reducciones' ) );
+					return hm_whm_paquete_especial( (string) $r->get_param( 'paquete' ), (array) $r->get_param( 'limites' ), (bool) $r->get_param( 'aplicar' ), false !== $r->get_param( 'omitir_reducciones' ), 'todas' === $r->get_param( 'alcance' ) ? 'todas' : 'importadas' );
 				},
 			)
 		);

@@ -249,9 +249,10 @@ def paquete_especial(wp, cfg):
     base = wp.api.rsplit("/wp/v2", 1)[0]
     r = wp.s.post(f"{base}/hm-whm/v1/paquete-especial", timeout=600, json={
         "paquete": pe["nombre"], "limites": {k: str(v) for k, v in (pe.get("limites") or {}).items()},
-        "aplicar": bool(pe.get("aplicar")), "omitir_reducciones": pe.get("omitir_reducciones", True)})
+        "aplicar": bool(pe.get("aplicar")), "omitir_reducciones": pe.get("omitir_reducciones", True),
+        "alcance": pe.get("alcance", "importadas")})
     if r.status_code == 404:
-        print("! Falta subir hm-whm 1.4.0.")
+        print("! Falta subir hm-whm 1.4.1.")
         return
     if r.status_code >= 400:
         fail(f"paquete especial -> {r.status_code}: {r.text[:300]}")
