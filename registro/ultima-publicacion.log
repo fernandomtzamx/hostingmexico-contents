@@ -1,8 +1,8 @@
-fecha: 2026-10-16T18:58:45Z
-commit: b4d50786db2614459a130cf329a530e5c6d7439f
+fecha: 2026-10-16T19:02:08Z
+commit: f9b0473418c49be899499c6f06a44082f17e49e4
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38951262612
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38951788703
 ---
 WP_URL: presente
 WP_USER: presente
@@ -68,7 +68,7 @@ Servicios: {'activo': 11, 'suspendido': 0, 'cancelado': 1} | próxima revisión 
 Usuario: soporte | importadas: 0 | ya registradas: 11 | excluidas: 5
 
 == Paquete especial
-Aplicado hostin30_hm_especial: cuentas 10 | movidas 8 | ya estaban 0 | con reducciones 2 (omitidas 2) | errores 0
+Aplicado hostin30_hm_especial: cuentas 10 | movidas 2 | ya estaban 8 | con reducciones 2 (omitidas 0) | errores 0
 
 == Sincronizar WHM -> sitio
 Servicios revisados: 11 | cuentas en WHM: 16 | cambios: 0
