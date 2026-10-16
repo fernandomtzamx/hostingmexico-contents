@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Hosting México: WHM
  * Description:       Vende hosting con WooCommerce: crea la cuenta cPanel al confirmarse el pago, avisa de renovaciones, suspende por falta de pago y reactiva al renovar, todo vía la API de WHM.
- * Version:           1.3.0
+ * Version:           1.4.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'HM_WHM_VERSION', '1.3.0' );
+define( 'HM_WHM_VERSION', '1.4.0' );
 define( 'HM_WHM_FILE', __FILE__ );
 define( 'HM_WHM_CPT', 'hm_servicio' );
 
@@ -1564,6 +1564,118 @@ function hm_whm_import( $login, array $excluir, $aplicar ) {
 	return $out;
 }
 
+/**
+ * Paquete especial para cuentas importadas (gestión manual), excepto la cuenta del revendedor.
+ * Simulación (aplicar=false): solo compara límites. Aplicación: crea/actualiza el paquete y mueve las cuentas.
+ * El detalle se envía por correo al administrador; la respuesta solo lleva totales.
+ *
+ * @return array|WP_Error
+ */
+function hm_whm_paquete_especial( $base, array $limites, $aplicar, $omitir_reducciones = true ) {
+	$base = sanitize_key( $base );
+	if ( '' === $base ) {
+		return new WP_Error( 'hm_whm_especial', 'Falta el nombre del paquete.' );
+	}
+	$permitidos = array( 'quota', 'bwlimit', 'maxpop', 'maxsql', 'maxsub', 'maxftp', 'maxaddon', 'maxpark', 'maxlst', 'hasshell', 'cgi', 'max_email_per_hour', 'max_emailacct_quota', 'featurelist' );
+	$specs      = array_intersect_key( $limites, array_flip( $permitidos ) );
+	$pkg        = HM_WHM_API::package_name( $base );
+
+	$data = HM_WHM_API::call( 'listaccts' );
+	if ( is_wp_error( $data ) ) {
+		return $data;
+	}
+	$whm = array();
+	foreach ( (array) ( isset( $data['acct'] ) ? $data['acct'] : array() ) as $a ) {
+		$whm[ strtolower( $a['user'] ) ] = $a;
+	}
+	$reseller = strtolower( (string) hm_whm_opt( 'user' ) );
+	$ids      = get_posts(
+		array(
+			'post_type'      => HM_WHM_CPT,
+			'post_status'    => 'any',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_query'     => array(
+				array( 'key' => '_hm_gestion', 'value' => 'manual' ),
+				array( 'key' => '_hm_status', 'value' => array( 'activo', 'suspendido' ), 'compare' => 'IN' ),
+			),
+		)
+	);
+	$num = function ( $v ) {
+		$v = strtolower( (string) $v );
+		if ( '' === $v || 'unlimited' === $v || '*unknown*' === $v ) {
+			return INF;
+		}
+		return (float) $v;
+	};
+	$mapa = array( 'quota' => 'disklimit', 'maxpop' => 'maxpop', 'maxsql' => 'maxsql', 'maxsub' => 'maxsub', 'maxftp' => 'maxftp', 'maxaddon' => 'maxaddons', 'maxpark' => 'maxparked' );
+	$filas = array();
+	$res   = array( 'paquete' => $pkg, 'aplicado' => (bool) $aplicar, 'cuentas' => 0, 'con_reducciones' => 0, 'movidas' => 0, 'omitidas' => 0, 'errores' => 0, 'ya_en_paquete' => 0 );
+	foreach ( $ids as $sid ) {
+		$u = strtolower( (string) get_post_meta( $sid, '_hm_user', true ) );
+		if ( $u === $reseller || ! isset( $whm[ $u ] ) ) {
+			continue;
+		}
+		$a = $whm[ $u ];
+		$res['cuentas']++;
+		$red = array();
+		foreach ( $mapa as $k => $campo ) {
+			if ( isset( $specs[ $k ], $a[ $campo ] ) && $num( $specs[ $k ] ) < $num( $a[ $campo ] ) ) {
+				$red[] = $k . ' ' . $a[ $campo ] . ' -> ' . $specs[ $k ];
+			}
+		}
+		if ( isset( $specs['hasshell'] ) && ! $specs['hasshell'] && isset( $a['shell'] ) && false === strpos( (string) $a['shell'], 'noshell' ) ) {
+			$red[] = 'pierde acceso SSH (' . $a['shell'] . ')';
+		}
+		if ( isset( $a['diskused'] ) && isset( $specs['quota'] ) && $num( $a['diskused'] ) > $num( $specs['quota'] ) * 0.9 ) {
+			$red[] = 'disco usado ' . $a['diskused'] . ' cerca o arriba del nuevo límite';
+		}
+		$fila = $u . ' (' . $a['domain'] . '): ' . $a['plan'] . ' -> ' . $pkg . ( $red ? ' | REDUCE: ' . implode( ', ', $red ) : '' );
+		if ( $red ) {
+			$res['con_reducciones']++;
+		}
+		if ( $aplicar ) {
+			if ( $a['plan'] === $pkg ) {
+				$res['ya_en_paquete']++;
+				$fila .= ' | ya estaba';
+			} elseif ( $red && $omitir_reducciones ) {
+				$res['omitidas']++;
+				$fila .= ' | OMITIDA (perdería límites; decide manualmente)';
+			} else {
+				$filas_pre = $fila;
+				if ( ! isset( $creado ) ) {
+					$creado = HM_WHM_API::package_exists( $base );
+					if ( is_wp_error( $creado ) ) {
+						return $creado;
+					}
+					$r = $creado ? HM_WHM_API::call( 'editpkg', array_merge( array( 'name' => $pkg ), $specs ) ) : HM_WHM_API::call( 'addpkg', array_merge( array( 'name' => $base ), $specs ) );
+					if ( is_wp_error( $r ) ) {
+						return new WP_Error( 'hm_whm_especial', 'No se pudo crear o actualizar el paquete: ' . $r->get_error_message() );
+					}
+					$creado = true;
+				}
+				$r = HM_WHM_API::call( 'changepackage', array( 'user' => $a['user'], 'pkg' => $pkg ) );
+				if ( is_wp_error( $r ) ) {
+					$res['errores']++;
+					$fila = $filas_pre . ' | ERROR: ' . $r->get_error_message();
+				} else {
+					$res['movidas']++;
+					update_post_meta( $sid, '_hm_package', $pkg );
+					hm_whm_log( $sid, 'Paquete cambiado en WHM: ' . $a['plan'] . ' -> ' . $pkg . '.' );
+					$fila .= ' | OK';
+				}
+			}
+		}
+		$filas[] = $fila;
+	}
+	hm_whm_mail_admin(
+		( $aplicar ? 'Paquete especial aplicado: ' : 'Simulación de paquete especial: ' ) . $pkg,
+		'<p>Límites: <code>' . esc_html( wp_json_encode( $specs ) ) . '</code></p><ul><li>' . implode( '</li><li>', array_map( 'esc_html', $filas ) ) . '</li></ul>'
+	);
+	update_option( 'hm_whm_ultimo_especial', array( 't' => time(), 'res' => $res, 'filas' => $filas ), 'no' );
+	return $res;
+}
+
 add_action(
 	'rest_api_init',
 	function () {
@@ -1577,6 +1689,19 @@ add_action(
 				'methods'             => 'GET',
 				'permission_callback' => $perm,
 				'callback'            => 'hm_whm_status',
+			)
+		);
+		register_rest_route(
+			'hm-whm/v1',
+			'/paquete-especial',
+			array(
+				'methods'             => 'POST',
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+				'callback'            => function ( WP_REST_Request $r ) {
+					return hm_whm_paquete_especial( (string) $r->get_param( 'paquete' ), (array) $r->get_param( 'limites' ), (bool) $r->get_param( 'aplicar' ), false !== $r->get_param( 'omitir_reducciones' ) );
+				},
 			)
 		);
 		register_rest_route(

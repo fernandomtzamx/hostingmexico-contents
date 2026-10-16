@@ -65,8 +65,27 @@ importar_whm:
   excluir: [shekhar, myeesol1, tilo, hhm, moxtec]
   aplicar: true
 
-# Guardar inventario de paquetes y uso por cuenta en registro/inventario-whm.json.
-inventario_whm: true
+# Paquete especial para las cuentas importadas (gestión manual), excepto la del revendedor.
+# No se vende en la tienda. Con omitir_reducciones, las cuentas que perderían algún límite
+# no se mueven y quedan reportadas en el correo del administrador.
+paquete_especial:
+  nombre: hm_especial
+  aplicar: true
+  omitir_reducciones: true
+  limites:
+    quota: 20480            # MB (20 GB)
+    bwlimit: 256000         # MB/mes (250 GB)
+    maxpop: unlimited
+    maxsql: unlimited
+    maxsub: unlimited
+    maxftp: unlimited
+    maxaddon: unlimited
+    maxpark: unlimited
+    maxlst: unlimited
+    hasshell: 0
+    cgi: 1
+    max_email_per_hour: 500
+    max_emailacct_quota: unlimited
 
 # Plugins del directorio de WordPress.org que se instalan y activan.
 plugins:

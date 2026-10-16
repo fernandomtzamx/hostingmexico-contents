@@ -10,3 +10,4 @@ Este repo alimenta hostingmexico.org, un sitio que vende un solo plan de hosting
 - Después de cada push, `git pull` y leer `registro/ultima-publicacion.log` para confirmar el resultado.
 - El plugin hm-whm y los mu-plugins (agente-auth, hostingmexico-gtm) no se despliegan por el workflow: si cambian, el usuario debe volver a subirlos.
 - Nunca pedir ni guardar tokens o contraseñas en el repo: van en los secretos de GitHub o en wp-config.php.
+- El repo es público: nunca guardar ni imprimir en registros datos de clientes (dominios, usuarios de cPanel, correos, IP, uso de cuentas). Solo totales; el detalle va a WP Admin o al correo del administrador.

@@ -204,14 +204,13 @@ def importar_whm(wp, cfg):
     d = r.json()
     modo = "importadas" if d.get("aplicado") else "se importarían (simulación)"
     print(f"Usuario: {d['usuario']} | {modo}: {len(d['importadas'])} | ya registradas: {len(d['ya_registradas'])} | excluidas: {len(d['excluidas'])}")
-    for f in d["importadas"]:
-        print(f"  + {f['usuario']:10} {f['dominio']:35} {f['estado']:10} paquete {f['paquete']}" + (f"  ERROR {f['error']}" if f.get("error") else ""))
-    for f in d["ya_registradas"]:
-        print(f"  = {f}")
-    print(f"  Excluidas: {', '.join(d['excluidas']) or 'ninguna'}")
+    # El repo es público: no se imprimen dominios ni usuarios. El detalle está en WooCommerce > Servicios de hosting.
+    errores = [f for f in d["importadas"] if f.get("error")]
+    if errores:
+        fail(f"{len(errores)} cuenta(s) no se pudieron importar (detalle en WP Admin)")
     faltan = [e for e in (imp.get("excluir") or []) if e.lower() not in d["excluidas"]]
     if faltan:
-        print(f"  ! Estas exclusiones no existen en WHM: {', '.join(faltan)}")
+        print(f"  ! {len(faltan)} exclusión(es) no existen en WHM; revisa la lista en sitio.yml")
 
 
 def sincronizar_whm(wp):
@@ -226,26 +225,43 @@ def sincronizar_whm(wp):
         return
     d = r.json()
     print(f"Servicios revisados: {d['revisadas']} | cuentas en WHM: {d['en_whm']} | cambios: {len(d['cambios'])}")
-    for cm in d["cambios"]:
-        print(f"  * {cm}")
+    # Sin dominios en el registro público: el detalle llega en el correo diario y en el historial de cada servicio.
 
 
 def inventario_whm(wp):
-    """Guarda paquetes y uso real de cada cuenta en registro/inventario-whm.json (solo lectura)."""
+    """Resumen del inventario de WHM (solo totales; nunca se guarda en el repo público)."""
     step("Inventario de WHM")
     base = wp.api.rsplit("/wp/v2", 1)[0]
     r = wp.s.get(f"{base}/hm-whm/v1/inventario", timeout=300)
+    if r.status_code >= 400:
+        fail(f"inventario -> {r.status_code}")
+        return None
+    d = r.json()
+    print(f"Paquetes: {len(d['paquetes'])} | cuentas: {len(d['cuentas'])} (detalle no publicado)")
+    return d
+
+
+def paquete_especial(wp, cfg):
+    pe = cfg.get("paquete_especial")
+    if not pe:
+        return
+    step("Paquete especial")
+    base = wp.api.rsplit("/wp/v2", 1)[0]
+    r = wp.s.post(f"{base}/hm-whm/v1/paquete-especial", timeout=600, json={
+        "paquete": pe["nombre"], "limites": {k: str(v) for k, v in (pe.get("limites") or {}).items()},
+        "aplicar": bool(pe.get("aplicar")), "omitir_reducciones": pe.get("omitir_reducciones", True)})
     if r.status_code == 404:
-        print("! Falta subir hm-whm 1.3.0 (la versión instalada no tiene inventario).")
+        print("! Falta subir hm-whm 1.4.0.")
         return
     if r.status_code >= 400:
-        fail(f"inventario -> {r.status_code}: {r.text[:300]}")
+        fail(f"paquete especial -> {r.status_code}: {r.text[:300]}")
         return
     d = r.json()
-    out = ROOT / "registro" / "inventario-whm.json"
-    out.parent.mkdir(exist_ok=True)
-    out.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"Paquetes: {len(d['paquetes'])} | cuentas: {len(d['cuentas'])} | guardado en registro/inventario-whm.json")
+    # Solo totales (repo público). El detalle por cuenta se envía al correo del administrador.
+    print(f"{'Aplicado' if d['aplicado'] else 'Simulación'} {d['paquete']}: cuentas {d['cuentas']} | movidas {d['movidas']} | "
+          f"ya estaban {d['ya_en_paquete']} | con reducciones {d['con_reducciones']} (omitidas {d['omitidas']}) | errores {d['errores']}")
+    if d["errores"]:
+        fail(f"{d['errores']} cuenta(s) no se pudieron mover (detalle en el correo del administrador)")
 
 
 def borrar(wp, cfg):
@@ -591,6 +607,7 @@ def main():
     producto(wp, cfg, publicar)
     whm(wp)
     importar_whm(wp, cfg)
+    paquete_especial(wp, cfg)
     sincronizar_whm(wp)
     if cfg.get("inventario_whm"):
         inventario_whm(wp)
