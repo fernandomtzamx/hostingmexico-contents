@@ -1,8 +1,8 @@
-fecha: 2026-10-16T16:51:24Z
-commit: d4f52adf271d2870dca25d6302e2405ec86516af
+fecha: 2026-10-16T17:49:18Z
+commit: d106f3f1fad29a7fb751bad91c71c9909d577cdc
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38935104828
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38942527266
 ---
 WP_URL: presente
 WP_USER: presente
@@ -62,29 +62,16 @@ Enlace de compra: https://www.hostingmexico.org/finalizar-compra/?add-to-cart=13
 
 == Plugin WHM
 Plugin 1.3.0 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_hm_basico: existe
-Servicios: {'activo': 12, 'suspendido': 0, 'cancelado': 0} | próxima revisión diaria: 2026-10-17T09:00:00-05:00
+Servicios: {'activo': 11, 'suspendido': 0, 'cancelado': 1} | próxima revisión diaria: 2026-10-17T09:00:00-05:00
 
 == Importar cuentas de WHM
 Usuario: soporte | importadas: 0 | ya registradas: 11 | excluidas: 5
-  = publimerca (publimerca.com)
-  = skmeimx (skmei.com.mx)
-  = seminuevos (seminuevos.net)
-  = fernandomartinez (fernandomartinez.mx)
-  = ugaxcom (ugax.com)
-  = hostin30 (hostingmexico.org)
-  = publi20 (publi20.com)
-  = garantias (garantias.net)
-  = martech (martech.mx)
-  = inboundcommx (inbound.com.mx)
-  = ubicaweb (ubicaweb.com)
-  Excluidas: myeesol1, hhm, tilo, moxtec, shekhar
+
+== Paquete especial
+! Falta subir hm-whm 1.4.0.
 
 == Sincronizar WHM -> sitio
-Servicios revisados: 12 | cuentas en WHM: 16 | cambios: 1
-  * juan.com: ya no existe en WHM, marcada cancelada
-
-== Inventario de WHM
-Paquetes: 15 | cuentas: 16 | guardado en registro/inventario-whm.json
+Servicios revisados: 11 | cuentas en WHM: 16 | cambios: 0
 
 == Contenido de ejemplo a la papelera
 = ya en papelera: posts/1 (hello-world)
