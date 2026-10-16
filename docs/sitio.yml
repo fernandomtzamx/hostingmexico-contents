@@ -58,7 +58,7 @@ pagos:
   desactivar: [bacs, cheque, cod, woo-mercado-pago-custom, woo-mercado-pago-ticket, woo-mercado-pago-credits, woo-mercado-pago-pix, woo-mercado-pago-pse, woo-mercado-pago-yape]
 
 # Paquete especial. alcance: importadas (cuentas de gestión manual) | todas (todas las de WHM).
-# Siempre se excluye la cuenta del revendedor.
+# Siempre se excluye la cuenta del revendedor y las de la tienda. Ejecución: 2026-10-16 13:07.
 # No se vende en la tienda. Con omitir_reducciones, las cuentas que perderían algún límite
 # no se mueven y quedan reportadas en el correo del administrador.
 paquete_especial:
