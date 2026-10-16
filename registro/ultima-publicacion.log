@@ -1,8 +1,8 @@
-fecha: 2026-10-16T15:23:43Z
-commit: 6955ede4324c03754a04ce0dba491432aa97f10c
+fecha: 2026-10-16T16:51:24Z
+commit: d4f52adf271d2870dca25d6302e2405ec86516af
 evento: push
 resultado: success
-run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38923496843
+run: https://github.com/fernandomtzamx/hostingmexico-contents/actions/runs/38935104828
 ---
 WP_URL: presente
 WP_USER: presente
@@ -18,7 +18,7 @@ Título: Hosting México | Zona: America/Mexico_City | Idioma: es_ES
 == Plugins
 = ya activo: woocommerce 11.2.1
 = ya activo: woocommerce-mercadopago 8.9.6
-= ya activo: hm-whm 1.2.0
+= ya activo: hm-whm 1.3.0
 
 == WooCommerce
 = woocommerce_currency: MXN
@@ -61,29 +61,30 @@ Producto actualizado: Hosting Básico $1899 (publish) id=13 https://www.hostingm
 Enlace de compra: https://www.hostingmexico.org/finalizar-compra/?add-to-cart=13
 
 == Plugin WHM
-Plugin 1.2.0 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_hm_basico: existe
+Plugin 1.3.0 | configurado: sí | WHM: 11.134.0.63 | paquete hostin30_hm_basico: existe
 Servicios: {'activo': 12, 'suspendido': 0, 'cancelado': 0} | próxima revisión diaria: 2026-10-17T09:00:00-05:00
 
 == Importar cuentas de WHM
 Usuario: soporte | importadas: 0 | ya registradas: 11 | excluidas: 5
-  = inboundcommx (inbound.com.mx)
-  = ubicaweb (ubicaweb.com)
-  = ugaxcom (ugax.com)
-  = fernandomartinez (fernandomartinez.mx)
-  = hostin30 (hostingmexico.org)
-  = seminuevos (seminuevos.net)
-  = martech (martech.mx)
-  = publi20 (publi20.com)
-  = garantias (garantias.net)
   = publimerca (publimerca.com)
   = skmeimx (skmei.com.mx)
-  Excluidas: shekhar, moxtec, hhm, tilo, myeesol1
+  = seminuevos (seminuevos.net)
+  = fernandomartinez (fernandomartinez.mx)
+  = ugaxcom (ugax.com)
+  = hostin30 (hostingmexico.org)
+  = publi20 (publi20.com)
+  = garantias (garantias.net)
+  = martech (martech.mx)
+  = inboundcommx (inbound.com.mx)
+  = ubicaweb (ubicaweb.com)
+  Excluidas: myeesol1, hhm, tilo, moxtec, shekhar
 
 == Sincronizar WHM -> sitio
-! Falta subir hm-whm 1.3.0 (la versión instalada no sincroniza).
+Servicios revisados: 12 | cuentas en WHM: 16 | cambios: 1
+  * juan.com: ya no existe en WHM, marcada cancelada
 
 == Inventario de WHM
-! Falta subir hm-whm 1.3.0 (la versión instalada no tiene inventario).
+Paquetes: 15 | cuentas: 16 | guardado en registro/inventario-whm.json
 
 == Contenido de ejemplo a la papelera
 = ya en papelera: posts/1 (hello-world)
